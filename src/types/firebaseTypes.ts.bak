@@ -1,0 +1,513 @@
+import { Timestamp } from "firebase-admin/firestore";
+
+// Base interface for common Firebase document fields
+export interface FirebaseDocument {
+  id: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// Enum for Flashcard Status
+export enum FirebaseFlashcardStatus {
+  ACTIVE = "active",
+  ARCHIVED = "archived",
+}
+
+// Interface for Flashcard
+export interface FirebaseFlashcard extends FirebaseDocument {
+  userId: string; // Creator of the flashcard
+  deckId: string; // ID of the deck it belongs to (can be enforced as mandatory at service level for creation)
+  questionId?: string; // Optional: if the flashcard is based on a specific question
+  front: string; // Front content (text/HTML)
+  back: string; // Back content (text/HTML)
+  personalNotes?: string; // Optional personal notes from the user about the flashcard
+  tags: string[]; // Array of tags
+  status: FirebaseFlashcardStatus; // Active or Archived
+  timesCorrect?: number;
+  timesIncorrect?: number;
+  lastReviewedAt_basic?: Timestamp; 
+}
+
+// Enum for Deck Status
+export enum FirebaseDeckStatus {
+  ACTIVE = "active",
+  ARCHIVED = "archived",
+}
+
+// Interface for Deck
+export interface FirebaseDeck extends FirebaseDocument {
+  userId: string; // Creator of the deck
+  name: string;
+  description?: string;
+  isPublic: boolean; // Public or private deck (default false)
+  tags: string[]; // Array of tags for the deck
+  flashcardCount: number; // Denormalized count of flashcards in this deck
+  coverImageUrl?: string; // Optional cover image for the deck
+  status: FirebaseDeckStatus; // Active or Archived
+}
+
+export interface FirebaseUserFlashcardInteraction extends FirebaseDocument {
+  userId: string;
+  flashcardId: string;
+  deckId?: string; 
+  easeFactor: number; 
+  interval: number; // in days
+  repetitions: number; 
+  lastReviewedAt: Timestamp;
+  nextReviewAt: Timestamp; 
+  isLearning?: boolean; 
+  isLeech?: boolean; 
+  failStreak?: number; 
+  lastReviewQuality: ReviewQuality; 
+  studyTime?: number; 
+  reviewNotes?: string; 
+}
+
+export type ReviewQuality = 0 | 1 | 2 | 3 | 4 | 5;
+
+export interface FirebaseFlashcardUserStatistics {
+  totalFlashcards: number;
+  activeFlashcards: number;
+  archivedFlashcards: number;
+  dueForReviewCount: number;
+  newTodayCount?: number;
+  learnedTodayCount?: number;
+  proficiencyByTag?: Record<string, { correct: number, incorrect: number, proficiency: number }>;
+}
+
+export interface AnkiImportOptions {
+  handleDuplicates?: "skip" | "overwrite" | "createNew"; 
+  defaultDeckId?: string; 
+  mapDeckNames?: Record<string, string>; 
+  importScheduling?: boolean; 
+  importMedia?: boolean; 
+}
+
+export interface AnkiImportResult {
+  importedFlashcardsCount: number;
+  importedDecksCount: number; 
+  skippedCount?: number;
+  updatedCount?: number;
+  errors: { message: string; item?: any; details?: string }[];
+}
+
+export interface AnkiExportOptions {
+  includeScheduling?: boolean; 
+  includeMedia?: boolean; 
+  deckIds?: string[]; 
+}
+
+export interface FirebaseFlashcardCreatePayload {
+  userId: string;
+  deckId: string;
+  questionId?: string;
+  front: string;
+  back: string;
+  personalNotes?: string;
+  tags?: string[];
+  status?: FirebaseFlashcardStatus;
+}
+
+export enum FirebaseStudySessionType {
+  QUESTIONS = "questions",
+  FLASHCARDS = "flashcards",
+  SIMULATED_EXAM = "simulated_exam",
+  ERROR_NOTEBOOK = "error_notebook",
+  REVIEW = "review",
+}
+
+export enum FirebaseStudySessionMood {
+  GREAT = "great",
+  GOOD = "good",
+  NEUTRAL = "neutral",
+  TIRED = "tired",
+  DISTRACTED = "distracted",
+  STRESSED = "stressed",
+}
+
+export enum FirebaseStudySessionDifficulty {
+  VERY_EASY = "very_easy",
+  EASY = "easy",
+  MEDIUM = "medium",
+  HARD = "hard",
+  VERY_HARD = "very_hard",
+}
+
+export interface FirebaseStudySession extends FirebaseDocument {
+  userId: string;
+  startTime: Timestamp;
+  endTime?: Timestamp | null;
+  duration?: number | null; 
+  questionsAnswered: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  accuracy?: number | null; 
+  studyType: FirebaseStudySessionType;
+  filters?: string[] | null; 
+  subFilters?: string[] | null; 
+  notes?: string | null;
+  mood?: FirebaseStudySessionMood | null;
+  difficulty?: FirebaseStudySessionDifficulty | null;
+  focusScore?: number | null; 
+  isCompleted: boolean;
+}
+
+export interface FirebaseUserQuestionHistory extends FirebaseDocument {
+  userId: string;
+  questionId: string;
+  selectedOptionId?: string | null;
+  viewedAt: Timestamp;
+  answeredAt?: Timestamp | null;
+  isCorrect?: boolean | null;
+  timeSpent?: number | null; 
+}
+
+export enum FirebaseAnswerCommentStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  SPAM = "spam",
+}
+
+export interface FirebaseAnswerComment extends FirebaseDocument {
+  content: string;
+  authorId: string; 
+  questionId: string; 
+  parentId?: string | null; 
+  status: FirebaseAnswerCommentStatus;
+}
+
+export enum FirebaseAnswerHistorySource {
+  WEB = "web",
+  MOBILE = "mobile",
+  IMPORT = "import",
+  SIMULATION = "simulation",
+}
+
+export interface FirebaseAnswerHistory extends FirebaseDocument {
+  userId: string;
+  questionId: string;
+  selectedOptionId?: string | null;
+  isCorrect: boolean;
+  answeredAt: Timestamp;
+  timeTaken?: number | null; 
+  source: FirebaseAnswerHistorySource;
+  simulationId?: string | null;
+  listId?: string | null; 
+  studySessionId?: string | null; 
+}
+
+export interface FirebaseSimulatedExamResultAnswer extends FirebaseDocument {
+  simulatedExamResultId: string;
+  questionId: string;
+  selectedOptionId?: string | null;
+  answerText?: string | null; 
+  isCorrect: boolean;
+  isSkipped: boolean;
+  timeSpent: number; 
+}
+
+// --- QuestionResponse Types ---
+export interface FirebaseQuestionResponse extends FirebaseDocument {
+  userId: string; 
+  questionId: string; 
+  questionListId?: string | null; 
+  selectedOptionId?: string | null; 
+  essayResponse?: string | null; 
+  isCorrectOnFirstAttempt: boolean; // Renamed from isCorrect for clarity in SRS context
+  responseTimeSeconds: number; 
+  addedToErrorNotebook: boolean; 
+  
+  // SRS Fields
+  reviewCount: number; 
+  lastReviewedAt: Timestamp | null; 
+  nextReviewDate: Timestamp; 
+  easeFactor: number; // Default 2.5
+  interval: number; // In days, default 0 or 1
+  repetitions: number; // Correct repetitions in a row, default 0
+  isLearning?: boolean; // Default true for new questions
+  isLeech?: boolean; // Default false
+  failStreak?: number; // Default 0
+  lastReviewQuality?: ReviewQuality | null; // Quality of the last review (0-5)
+}
+
+export interface FirebaseQuestionResponseCreatePayload {
+  userId: string;
+  questionId: string;
+  questionListId?: string | null;
+  selectedOptionId?: string | null;
+  essayResponse?: string | null;
+  isCorrectOnFirstAttempt: boolean;
+  responseTimeSeconds?: number; 
+  addedToErrorNotebook?: boolean; 
+  // SRS fields are typically initialized by the service, 
+  // but can be overridden if importing existing SRS data.
+  reviewCount?: number;
+  lastReviewedAt?: Timestamp; 
+  nextReviewDate?: Timestamp; 
+  easeFactor?: number; 
+  interval?: number; 
+  repetitions?: number; 
+  isLearning?: boolean;
+  isLeech?: boolean;
+  failStreak?: number;
+  lastReviewQuality?: ReviewQuality | null;
+}
+
+export interface FirebaseQuestionResponseUpdatePayload {
+  selectedOptionId?: string | null;
+  essayResponse?: string | null;
+  isCorrectOnFirstAttempt?: boolean;
+  responseTimeSeconds?: number;
+  addedToErrorNotebook?: boolean;
+  // SRS fields will be updated by a dedicated SRS logic function
+  // but direct updates might be needed for manual adjustments or corrections.
+  reviewCount?: number; 
+  lastReviewedAt?: Timestamp; 
+  nextReviewDate?: Timestamp; 
+  easeFactor?: number; 
+  interval?: number; 
+  repetitions?: number; 
+  isLearning?: boolean;
+  isLeech?: boolean;
+  failStreak?: number;
+  lastReviewQuality?: ReviewQuality | null;
+}
+
+// --- ErrorNotebook Types ---
+export interface FirebaseErrorNotebook extends FirebaseDocument {
+  userId: string;
+  title: string;
+  description?: string | null;
+  isPublic: boolean;
+  lastEntryAt?: Timestamp | null;
+  entryCount: number;
+  tags?: string[] | null;
+}
+
+export interface FirebaseErrorNotebookCreatePayload {
+  userId: string;
+  title: string;
+  description?: string | null;
+  isPublic?: boolean; // Default to false in service if not provided
+  tags?: string[] | null;
+}
+
+export interface FirebaseErrorNotebookUpdatePayload {
+  title?: string;
+  description?: string | null;
+  isPublic?: boolean;
+  tags?: string[] | null;
+  // entryCount and lastEntryAt are managed by entry additions/removals
+}
+
+// --- ErrorNotebookEntry Types ---
+export type ErrorCategory = "conceptual" | "calculation" | "interpretation" | "inattention" | "knowledge_gap" | "other";
+
+// Adicionando FirebaseProgrammedReviewStatus e FirebaseProgrammedReviewContentType aqui para uso
+// já que são referenciados em ErrorNotebookEntry e ProgrammedReview
+export enum FirebaseProgrammedReviewStatus {
+  LEARNING = "learning",
+  REVIEWING = "reviewing",
+  MASTERED = "mastered",
+  RETIRED = "retired", // e.g., user manually retires it, or system retires after long mastery
+  SUSPENDED = "suspended", // Manually suspended by user
+}
+
+export enum FirebaseProgrammedReviewContentType {
+  QUESTION = "question",
+  FLASHCARD = "flashcard",
+  ERROR_NOTEBOOK_ENTRY = "error_notebook_entry",
+  CUSTOM_NOTE = "custom_note",
+  // Potentially others like "topic", "deck_summary"
+}
+
+export interface FirebaseErrorNotebookEntry extends FirebaseDocument {
+  notebookId: string; 
+  questionId: string; 
+  userAnswer?: string | null; 
+  errorDescription?: string | null; 
+  errorCategory?: ErrorCategory | null; 
+  isResolved: boolean; 
+  resolvedAt?: Timestamp | null; 
+  personalNotes?: string | null; 
+  tags?: string[] | null; 
+
+  // Campos SRS atualizados para ErrorNotebookEntry
+  reviewCount: number; 
+  lastReviewedAt?: Timestamp | null; 
+  nextReviewAt?: Timestamp | null; 
+  srsInterval?: number; // Intervalo em dias para a próxima revisão
+  srsEaseFactor?: number; // Fator de facilidade (SM-2)
+  srsRepetitions?: number; // Número de revisões corretas consecutivas
+  srsLapses?: number; // Número de vezes que o item foi esquecido após aprendizado inicial
+  srsStatus?: FirebaseProgrammedReviewStatus; // Status do aprendizado SRS (learning, reviewing, mastered)
+}
+
+export interface FirebaseErrorNotebookEntryCreatePayload {
+  notebookId: string;
+  questionId: string;
+  userAnswer?: string | null;
+  errorDescription?: string | null;
+  errorCategory?: ErrorCategory | null;
+  isResolved?: boolean; // Default to false in service
+  personalNotes?: string | null;
+  tags?: string[] | null;
+  // Campos SRS são inicializados pelo serviço
+}
+
+export interface FirebaseErrorNotebookEntryUpdatePayload {
+  userAnswer?: string | null;
+  errorDescription?: string | null;
+  errorCategory?: ErrorCategory | null;
+  isResolved?: boolean;
+  resolvedAt?: Timestamp | null; 
+  personalNotes?: string | null;
+  tags?: string[] | null;
+  // Campos SRS não devem ser atualizados diretamente por este payload;
+  // usar uma função específica como `recordErrorNotebookEntryReview`.
+}
+
+// --- ProgrammedReview Types ---
+export interface FirebaseProgrammedReview extends FirebaseDocument {
+  userId: string;
+  contentId: string; // ID do item a ser revisado (e.g., QuestionResponse ID, ErrorNotebookEntry ID, Flashcard ID)
+  contentType: FirebaseProgrammedReviewContentType;
+  deckId?: string | null; // Opcional, se o conteúdo pertencer a um deck (ex: flashcard)
+  originalAnswerCorrect?: boolean | null; // Para QuestionResponse, se a resposta original foi correta
+  
+  // Campos SRS
+  lastReviewedAt: Timestamp | null;
+  nextReviewAt: Timestamp;
+  intervalDays: number;
+  easeFactor: number;
+  repetitions: number;
+  lapses: number;
+  status: FirebaseProgrammedReviewStatus;
+  notes?: string | null; // Notas específicas para esta programação de revisão
+}
+
+// Não há payload de criação explícito para ProgrammedReview no código fornecido anteriormente,
+// mas seria algo como:
+export interface FirebaseProgrammedReviewCreatePayload {
+  userId: string;
+  contentId: string;
+  contentType: FirebaseProgrammedReviewContentType;
+  nextReviewAt: Timestamp;
+  deckId?: string | null;
+  intervalDays?: number; // Pode ser inicializado pelo serviço que cria
+  easeFactor?: number;   // Pode ser inicializado pelo serviço que cria
+  repetitions?: number; // Pode ser inicializado pelo serviço que cria
+  lapses?: number;      // Pode ser inicializado pelo serviço que cria
+  status?: FirebaseProgrammedReviewStatus; // Pode ser inicializado pelo serviço que cria
+  notes?: string | null;
+  lastReviewedAt?: Timestamp | null; // Opcional na criação, se já houve uma revisão que disparou isso
+  originalAnswerCorrect?: boolean | null;
+}
+
+// Payload para atualizar um ProgrammedReview, especialmente após uma revisão
+export interface FirebaseProgrammedReviewUpdatePayload {
+  lastReviewedAt?: Timestamp;
+  nextReviewAt?: Timestamp;
+  intervalDays?: number;
+  easeFactor?: number;
+  repetitions?: number;
+  lapses?: number;
+  status?: FirebaseProgrammedReviewStatus;
+  notes?: string | null;
+  originalAnswerCorrect?: boolean | null; // Pode ser atualizado se relevante
+}
+
+// --- Review (Avaliação de Conteúdo) Types ---
+export enum FirebaseReviewStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  SPAM = "spam",
+}
+
+export interface FirebaseReview extends FirebaseDocument {
+  userId: string; // ID do autor da avaliação
+  targetId: string; // ID da entidade sendo avaliada (ex: Question ID, Course ID)
+  targetType: string; // Tipo da entidade (ex: "question", "course")
+  rating: number; // Nota de 1 a 5
+  comment: string;
+  status: FirebaseReviewStatus;
+  // helpfulCount?: number; // Removido, pois não estava no tipo original e a lógica foi desativada no serviço
+  // notHelpfulCount?: number; // Removido
+  // isEdited?: boolean; // Removido
+  // title?: string | null; // Removido
+}
+
+export interface FirebaseReviewCreatePayload {
+  userId: string;
+  targetId: string;
+  targetType: string;
+  rating: number;
+  comment: string;
+  status?: FirebaseReviewStatus; // Opcional, serviço pode definir padrão
+}
+
+export interface FirebaseReviewUpdatePayload {
+  rating?: number;
+  comment?: string;
+  status?: FirebaseReviewStatus;
+}
+
+
+
+
+// --- QuestionList Types ---
+export interface FirebaseQuestionList extends FirebaseDocument {
+  userId: string; // ID do criador da lista
+  title: string;
+  description?: string | null;
+  isPublic: boolean; // Se a lista é pública ou privada
+  tags?: string[] | null; // Tags para categorizar a lista
+  questionCount: number; // Quantidade de questões na lista (denormalizado)
+  lastAddedAt?: Timestamp | null; // Quando o último item foi adicionado
+  // Campos de estatísticas de estudo da lista (opcional, pode ser calculado ou um serviço separado)
+  // totalViews?: number;
+  // averageScore?: number; // Se houver um mecanismo de "tentativa" da lista toda
+}
+
+export interface FirebaseQuestionListCreatePayload {
+  userId: string;
+  title: string;
+  description?: string | null;
+  isPublic?: boolean; // Padrão para false no serviço
+  tags?: string[] | null;
+}
+
+export interface FirebaseQuestionListUpdatePayload {
+  title?: string;
+  description?: string | null;
+  isPublic?: boolean;
+  tags?: string[] | null;
+}
+
+// --- QuestionListItem Types ---
+export interface FirebaseQuestionListItem extends FirebaseDocument {
+  questionListId: string; // ID da lista à qual este item pertence
+  questionId: string; // ID da questão original
+  order: number; // Ordem da questão dentro da lista
+  addedAt: Timestamp; // Quando a questão foi adicionada à lista
+  personalNotes?: string | null; // Notas pessoais do usuário para esta questão neste contexto de lista
+}
+
+export interface FirebaseQuestionListItemCreatePayload {
+  questionListId: string;
+  questionId: string;
+  order: number;
+  personalNotes?: string | null;
+}
+
+// Não é comum atualizar um QuestionListItem diretamente, exceto talvez a ordem ou notas.
+// A remoção é uma operação separada, e adicionar é criar um novo.
+// Se a ordem for gerenciada por um array no QuestionList, então a atualização da lista manipula isso.
+// Se forem documentos separados, a ordem pode ser um campo atualizável.
+export interface FirebaseQuestionListItemUpdatePayload {
+  order?: number;
+  personalNotes?: string | null;
+}
+

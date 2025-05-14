@@ -1,0 +1,94 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "invoices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "flashcards",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "deckId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userFlashcardInteractions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "flashcardId", "order": "ASCENDING" },
+        { "fieldPath": "reviewedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userFlashcardInteractions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "nextReviewAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "questionResponses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "questionId", "order": "ASCENDING" },
+        { "fieldPath": "answeredAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "questionResponses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "nextReviewDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "searchTerms",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "term", "order": "ASCENDING" },
+        { "fieldPath": "count", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "searchTerms",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "count", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userStatistics",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "questionListItems",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "questionListId", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

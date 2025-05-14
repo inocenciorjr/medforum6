@@ -1,0 +1,802 @@
+
+> forummed-backend-recreated@1.0.0 test
+> jest
+
+FAIL src/tests/integration/services/firebaseUserStatisticsService.integration.test.ts
+  ● Test suite failed to run
+
+    [96msrc/tests/integration/services/firebaseUserStatisticsService.integration.test.ts[0m:[93m108[0m:[93m20[0m - [91merror[0m[90m TS18048: [0m'stats.accuracyPerDifficulty' is possibly 'undefined'.
+
+    [7m108[0m             expect(stats.accuracyPerDifficulty[FirebaseQuestionDifficulty.EASY].correct).toBe(1);
+    [7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseUserStatisticsService.integration.test.ts[0m:[93m109[0m:[93m20[0m - [91merror[0m[90m TS18048: [0m'stats.accuracyPerDifficulty' is possibly 'undefined'.
+
+    [7m109[0m             expect(stats.accuracyPerDifficulty[FirebaseQuestionDifficulty.EASY].total).toBe(1);
+    [7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseUserStatisticsService.integration.test.ts[0m:[93m130[0m:[93m20[0m - [91merror[0m[90m TS18048: [0m'stats.accuracyPerDifficulty' is possibly 'undefined'.
+
+    [7m130[0m             expect(stats.accuracyPerDifficulty[FirebaseQuestionDifficulty.HARD].correct).toBe(0);
+    [7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseUserStatisticsService.integration.test.ts[0m:[93m131[0m:[93m20[0m - [91merror[0m[90m TS18048: [0m'stats.accuracyPerDifficulty' is possibly 'undefined'.
+
+    [7m131[0m             expect(stats.accuracyPerDifficulty[FirebaseQuestionDifficulty.HARD].total).toBe(1);
+    [7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseUserStatisticsService.integration.test.ts[0m:[93m151[0m:[93m20[0m - [91merror[0m[90m TS18048: [0m'stats.accuracyPerDifficulty' is possibly 'undefined'.
+
+    [7m151[0m             expect(stats.accuracyPerDifficulty[FirebaseQuestionDifficulty.MEDIUM].total).toBe(2);
+    [7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseUserStatisticsService.integration.test.ts[0m:[93m152[0m:[93m20[0m - [91merror[0m[90m TS18048: [0m'stats.accuracyPerDifficulty' is possibly 'undefined'.
+
+    [7m152[0m             expect(stats.accuracyPerDifficulty[FirebaseQuestionDifficulty.EASY].total).toBe(1);
+    [7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+FAIL src/tests/utils/pdf/invoiceGenerator.test.ts
+  ● Test suite failed to run
+
+    [96msrc/tests/utils/pdf/invoiceGenerator.test.ts[0m:[93m75[0m:[93m11[0m - [91merror[0m[90m TS2739: [0mType '{ id: string; userId: string; planId: string; amount: number; status: FirebasePaymentStatus.APPROVED; paymentMethod: FirebasePaymentMethod.CREDIT_CARD; description: string; paidAt: Timestamp; createdAt: Timestamp; updatedAt: Timestamp; }' is missing the following properties from type 'FirebasePayment': originalAmount, discountAmount, currency
+
+    [7m75[0m     const mockPayment: FirebasePayment = {
+    [7m  [0m [91m          ~~~~~~~~~~~[0m
+
+FAIL src/tests/controllers/payment/paymentController.test.ts
+  ● Test suite failed to run
+
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m74[0m:[93m59[0m - [91merror[0m[90m TS2339: [0mProperty 'isActive' does not exist on type 'FirebaseUserPlan'.
+
+    [7m74[0m       if (userPlans.some(up => up.planId === planId && up.isActive)) {
+    [7m  [0m [91m                                                          ~~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m128[0m:[93m69[0m - [91merror[0m[90m TS2345: [0mArgument of type '{ paymentId: string; pixQrCode: string; pixCopiaECola: string; status: FirebasePaymentStatus; expirationDate: Timestamp; }' is not assignable to parameter of type 'Omit<FirebasePixPayment, "id" | "createdAt" | "updatedAt">'.
+      Types of property 'status' are incompatible.
+        Type 'FirebasePaymentStatus' is not assignable to type 'FirebasePixStatus'.
+
+    [7m128[0m         const pixPayment = await pixPaymentService.createPixPayment(pixData);
+    [7m   [0m [91m                                                                    ~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m155[0m:[93m82[0m - [91merror[0m[90m TS2345: [0mArgument of type '{ paymentId: string; cardHolderName: any; cardLastFourDigits: any; cardBrand: any; installments: any; status: FirebasePaymentStatus; paymentMethodId: any; }' is not assignable to parameter of type 'Omit<FirebaseCreditCardPayment, "id" | "createdAt" | "updatedAt">'.
+      Types of property 'status' are incompatible.
+        Type 'FirebasePaymentStatus' is not assignable to type 'FirebaseCreditCardPaymentStatus'.
+
+    [7m155[0m         const ccPayment = await creditCardPaymentService.createCreditCardPayment(creditCardData);
+    [7m   [0m [91m                                                                                 ~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m302[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'payments' does not exist on type 'FirebasePayment[]'.
+
+    [7m302[0m         data: snapshot.payments, // Access the payments array from the snapshot object
+    [7m   [0m [91m                       ~~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m304[0m:[93m42[0m - [91merror[0m[90m TS2339: [0mProperty 'nextPageStartAfter' does not exist on type 'FirebasePayment[]'.
+
+    [7m304[0m             nextPageStartAfter: snapshot.nextPageStartAfter
+    [7m   [0m [91m                                         ~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m509[0m:[93m33[0m - [91merror[0m[90m TS2339: [0mProperty 'activateUserPlanAfterPayment' does not exist on type 'typeof import("/home/ubuntu/MEDFORUM_project/src/services/firebaseUserPlanService")'.
+
+    [7m509[0m           await userPlanService.activateUserPlanAfterPayment(payment.id);
+    [7m   [0m [91m                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m554[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'payments' does not exist on type 'FirebasePayment[]'.
+
+    [7m554[0m         totalPayments: allPayments.payments.length,
+    [7m   [0m [91m                                   ~~~~~~~~[0m
+    [96msrc/controllers/payment/paymentController.ts[0m:[93m564[0m:[93m19[0m - [91merror[0m[90m TS2339: [0mProperty 'payments' does not exist on type 'FirebasePayment[]'.
+
+    [7m564[0m       allPayments.payments.forEach((p: FirebasePaymentType) => {
+    [7m   [0m [91m                  ~~~~~~~~[0m
+
+FAIL src/tests/integration/services/firebaseSimulatedExamService.integration.test.ts
+  ● Test suite failed to run
+
+    [96msrc/tests/integration/services/firebaseSimulatedExamService.integration.test.ts[0m:[93m119[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'userId' does not exist on type 'FirebaseSimulatedExam'.
+
+    [7m119[0m       expect(createdExam.userId).toBe(testUserId);
+    [7m   [0m [91m                         ~~~~~~[0m
+
+FAIL src/tests/integration/services/firebaseQuestionListService.integration.test.ts
+  ● Test suite failed to run
+
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m104[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'title' does not exist on type 'FirebaseQuestionList'.
+
+    [7m104[0m       expect(createdList.title).toBe(listData.title);
+    [7m   [0m [91m                         ~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m107[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'viewCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m107[0m       expect(createdList.viewCount).toBe(0);
+    [7m   [0m [91m                         ~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m108[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'favoriteCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m108[0m       expect(createdList.favoriteCount).toBe(0);
+    [7m   [0m [91m                         ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m109[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'lastStudyDate' does not exist on type 'FirebaseQuestionList'.
+
+    [7m109[0m       expect(createdList.lastStudyDate).toBeNull();
+    [7m   [0m [91m                         ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m110[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'completionPercentage' does not exist on type 'FirebaseQuestionList'.
+
+    [7m110[0m       expect(createdList.completionPercentage).toBe(0);
+    [7m   [0m [91m                         ~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m112[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'lastAddedAt' does not exist on type 'FirebaseQuestionList'.
+
+    [7m112[0m       expect(createdList.lastAddedAt).toBeNull();
+    [7m   [0m [91m                         ~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m155[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'isCompleted' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m155[0m       expect(listItem.isCompleted).toBe(false);
+    [7m   [0m [91m                      ~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m156[0m:[93m23[0m - [91merror[0m[90m TS2551: [0mProperty 'lastAttemptDate' does not exist on type 'FirebaseQuestionListItem'. Did you mean 'lastAttemptedAt'?
+
+    [7m156[0m       expect(listItem.lastAttemptDate).toBeNull();
+    [7m   [0m [91m                      ~~~~~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m808[0m:[93m3[0m
+        [7m808[0m   lastAttemptedAt?: Timestamp | null;
+        [7m   [0m [96m  ~~~~~~~~~~~~~~~[0m
+        'lastAttemptedAt' is declared here.
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m157[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'correctAttempts' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m157[0m       expect(listItem.correctAttempts).toBe(0);
+    [7m   [0m [91m                      ~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m158[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'incorrectAttempts' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m158[0m       expect(listItem.incorrectAttempts).toBe(0);
+    [7m   [0m [91m                      ~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m162[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'lastAddedAt' does not exist on type 'FirebaseQuestionList'.
+
+    [7m162[0m       expect(updatedList?.lastAddedAt).toBeInstanceOf(Timestamp);
+    [7m   [0m [91m                          ~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m190[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'viewCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m190[0m       expect(fetchedList?.viewCount).toBe(1);
+    [7m   [0m [91m                          ~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m194[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'viewCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m194[0m       expect(fetchedList?.viewCount).toBe(2);
+    [7m   [0m [91m                          ~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m208[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'favoriteCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m208[0m       expect(fetchedList?.favoriteCount).toBe(1);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m215[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'favoriteCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m215[0m       expect(fetchedList?.favoriteCount).toBe(0);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m222[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'favoriteCount' does not exist on type 'FirebaseQuestionList'.
+
+    [7m222[0m       expect(fetchedList?.favoriteCount).toBe(1);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m241[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'completionPercentage' does not exist on type 'FirebaseQuestionList'.
+
+    [7m241[0m       expect(fetchedList?.completionPercentage).toBe(0);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m246[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'completionPercentage' does not exist on type 'FirebaseQuestionList'.
+
+    [7m246[0m       expect(fetchedList?.completionPercentage).toBe(50);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m251[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'completionPercentage' does not exist on type 'FirebaseQuestionList'.
+
+    [7m251[0m       expect(fetchedList?.completionPercentage).toBe(100);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m270[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'lastStudyDate' does not exist on type 'FirebaseQuestionList'.
+
+    [7m270[0m       expect(updatedList?.lastStudyDate).toBeInstanceOf(Timestamp);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m271[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'completionPercentage' does not exist on type 'FirebaseQuestionList'.
+
+    [7m271[0m       expect(updatedList?.completionPercentage).toBe(100);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m274[0m:[93m27[0m - [91merror[0m[90m TS2551: [0mProperty 'lastAttemptDate' does not exist on type 'FirebaseQuestionListItem'. Did you mean 'lastAttemptedAt'?
+
+    [7m274[0m       expect(updatedItem?.lastAttemptDate).toBeInstanceOf(Timestamp);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m808[0m:[93m3[0m
+        [7m808[0m   lastAttemptedAt?: Timestamp | null;
+        [7m   [0m [96m  ~~~~~~~~~~~~~~~[0m
+        'lastAttemptedAt' is declared here.
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m275[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'isCompleted' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m275[0m       expect(updatedItem?.isCompleted).toBe(true);
+    [7m   [0m [91m                          ~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m276[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'correctAttempts' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m276[0m       expect(updatedItem?.correctAttempts).toBe(1);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m277[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'incorrectAttempts' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m277[0m       expect(updatedItem?.incorrectAttempts).toBe(0);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m294[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'lastStudyDate' does not exist on type 'FirebaseQuestionList'.
+
+    [7m294[0m       expect(updatedList?.lastStudyDate).toBeInstanceOf(Timestamp);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m295[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'completionPercentage' does not exist on type 'FirebaseQuestionList'.
+
+    [7m295[0m       expect(updatedList?.completionPercentage).toBe(0);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m298[0m:[93m27[0m - [91merror[0m[90m TS2551: [0mProperty 'lastAttemptDate' does not exist on type 'FirebaseQuestionListItem'. Did you mean 'lastAttemptedAt'?
+
+    [7m298[0m       expect(updatedItem?.lastAttemptDate).toBeInstanceOf(Timestamp);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m808[0m:[93m3[0m
+        [7m808[0m   lastAttemptedAt?: Timestamp | null;
+        [7m   [0m [96m  ~~~~~~~~~~~~~~~[0m
+        'lastAttemptedAt' is declared here.
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m299[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'isCompleted' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m299[0m       expect(updatedItem?.isCompleted).toBe(false);
+    [7m   [0m [91m                          ~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m300[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'correctAttempts' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m300[0m       expect(updatedItem?.correctAttempts).toBe(0);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseQuestionListService.integration.test.ts[0m:[93m301[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'incorrectAttempts' does not exist on type 'FirebaseQuestionListItem'.
+
+    [7m301[0m       expect(updatedItem?.incorrectAttempts).toBe(1);
+    [7m   [0m [91m                          ~~~~~~~~~~~~~~~~~[0m
+
+(node:3593) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+FAIL src/tests/integration/services/firebaseFlashcardService.integration.test.ts
+  ● Test suite failed to run
+
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m90[0m:[93m17[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m90[0m                 status: FirebaseProgrammedReviewStatus.LEARNING // Using correct enum for flashcard status
+    [7m  [0m [91m                ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m99[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'frontContent' does not exist on type 'FirebaseFlashcard'.
+
+    [7m99[0m             expect(flashcard.frontContent).toBe("Test Front"); // Corrected from front
+    [7m  [0m [91m                             ~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m103[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'intervalDays' does not exist on type 'FirebaseFlashcard'.
+
+    [7m103[0m             expect(flashcard.intervalDays).toBe(0);
+    [7m   [0m [91m                             ~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m104[0m:[93m30[0m - [91merror[0m[90m TS2551: [0mProperty 'easeFactor' does not exist on type 'FirebaseFlashcard'. Did you mean 'srsEaseFactor'?
+
+    [7m104[0m             expect(flashcard.easeFactor).toBe(2.5);
+    [7m   [0m [91m                             ~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m107[0m:[93m3[0m
+        [7m107[0m   srsEaseFactor?: number;
+        [7m   [0m [96m  ~~~~~~~~~~~~~[0m
+        'srsEaseFactor' is declared here.
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m105[0m:[93m30[0m - [91merror[0m[90m TS2551: [0mProperty 'repetitions' does not exist on type 'FirebaseFlashcard'. Did you mean 'srsRepetitions'?
+
+    [7m105[0m             expect(flashcard.repetitions).toBe(0); // Corrected from reviewsCount
+    [7m   [0m [91m                             ~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m108[0m:[93m3[0m
+        [7m108[0m   srsRepetitions?: number;
+        [7m   [0m [96m  ~~~~~~~~~~~~~~[0m
+        'srsRepetitions' is declared here.
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m106[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'lapses' does not exist on type 'FirebaseFlashcard'.
+
+    [7m106[0m             expect(flashcard.lapses).toBe(0);      // Corrected from lapsesCount
+    [7m   [0m [91m                             ~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m120[0m:[93m142[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m120[0m             const payload: FirebaseFlashcardCreatePayload = { userId: testUserId, deckId: testDeckId, frontContent: "F1", backContent: "B1", status: FirebaseProgrammedReviewStatus.LEARNING };
+    [7m   [0m [91m                                                                                                                                             ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m129[0m:[93m157[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m129[0m             const flashcard = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "Q", backContent: "A", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                            ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m135[0m:[93m37[0m - [91merror[0m[90m TS2551: [0mProperty 'repetitions' does not exist on type 'FirebaseFlashcard'. Did you mean 'srsRepetitions'?
+
+    [7m135[0m             expect(updatedFlashcard.repetitions).toBe(1); // Corrected from reviewsCount
+    [7m   [0m [91m                                    ~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m108[0m:[93m3[0m
+        [7m108[0m   srsRepetitions?: number;
+        [7m   [0m [96m  ~~~~~~~~~~~~~~[0m
+        'srsRepetitions' is declared here.
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m136[0m:[93m37[0m - [91merror[0m[90m TS2339: [0mProperty 'lapses' does not exist on type 'FirebaseFlashcard'.
+
+    [7m136[0m             expect(updatedFlashcard.lapses).toBe(0);      // Corrected from lapsesCount
+    [7m   [0m [91m                                    ~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m137[0m:[93m37[0m - [91merror[0m[90m TS2339: [0mProperty 'intervalDays' does not exist on type 'FirebaseFlashcard'.
+
+    [7m137[0m             expect(updatedFlashcard.intervalDays).toBe(1);
+    [7m   [0m [91m                                    ~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m138[0m:[93m37[0m - [91merror[0m[90m TS2551: [0mProperty 'easeFactor' does not exist on type 'FirebaseFlashcard'. Did you mean 'srsEaseFactor'?
+
+    [7m138[0m             expect(updatedFlashcard.easeFactor).toBeCloseTo(2.5 + (0.1 - (5 - reviewQuality) * (0.08 + (5 - reviewQuality) * 0.02)), 5); // Using 5 as max quality for formula
+    [7m   [0m [91m                                    ~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m107[0m:[93m3[0m
+        [7m107[0m   srsEaseFactor?: number;
+        [7m   [0m [96m  ~~~~~~~~~~~~~[0m
+        'srsEaseFactor' is declared here.
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m152[0m:[93m157[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m152[0m             let flashcard = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "Q2", backContent: "A2", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                            ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m159[0m:[93m44[0m - [91merror[0m[90m TS2551: [0mProperty 'repetitions' does not exist on type 'FirebaseFlashcard'. Did you mean 'srsRepetitions'?
+
+    [7m159[0m             expect(flashcardAfterBadReview.repetitions).toBe(2); // Corrected from reviewsCount
+    [7m   [0m [91m                                           ~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m108[0m:[93m3[0m
+        [7m108[0m   srsRepetitions?: number;
+        [7m   [0m [96m  ~~~~~~~~~~~~~~[0m
+        'srsRepetitions' is declared here.
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m160[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'lapses' does not exist on type 'FirebaseFlashcard'.
+
+    [7m160[0m             expect(flashcardAfterBadReview.lapses).toBe(1);      // Corrected from lapsesCount
+    [7m   [0m [91m                                           ~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m161[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'intervalDays' does not exist on type 'FirebaseFlashcard'.
+
+    [7m161[0m             expect(flashcardAfterBadReview.intervalDays).toBe(0);
+    [7m   [0m [91m                                           ~~~~~~~~~~~~[0m
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m162[0m:[93m44[0m - [91merror[0m[90m TS2551: [0mProperty 'easeFactor' does not exist on type 'FirebaseFlashcard'. Did you mean 'srsEaseFactor'?
+
+    [7m162[0m             expect(flashcardAfterBadReview.easeFactor).toBeLessThan(2.5);
+    [7m   [0m [91m                                           ~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m107[0m:[93m3[0m
+        [7m107[0m   srsEaseFactor?: number;
+        [7m   [0m [96m  ~~~~~~~~~~~~~[0m
+        'srsEaseFactor' is declared here.
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m168[0m:[93m164[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m168[0m             const dueFlashcard = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "Due", backContent: "Now", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                                   ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m171[0m:[93m165[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m171[0m             const notDueFlashcardPayload: FirebaseFlashcardCreatePayload = { userId: testUserId, deckId: testDeckId, frontContent: "Not Due", backContent: "Later", status: FirebaseProgrammedReviewStatus.LEARNING };
+    [7m   [0m [91m                                                                                                                                                                    ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m184[0m:[93m173[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m184[0m             const flashcard = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "To Archive", backContent: "Archived", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                                            ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m193[0m:[93m175[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m193[0m             let flashcard = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "To Unarchive", backContent: "Unarchived", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                                              ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m206[0m:[93m154[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m206[0m             const fc1 = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "FC1", backContent: "B1", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                         ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m209[0m:[93m154[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m209[0m             const fc2 = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "FC2", backContent: "B2", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                         ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m212[0m:[93m154[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m212[0m             const fc3 = await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: testDeckId, frontContent: "FC3", backContent: "B3", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                                         ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+    [96msrc/tests/integration/services/firebaseFlashcardService.integration.test.ts[0m:[93m217[0m:[93m143[0m - [91merror[0m[90m TS2322: [0mType 'FirebaseProgrammedReviewStatus.LEARNING' is not assignable to type 'FirebaseFlashcardStatus'.
+
+    [7m217[0m             await firebaseFlashcardService.createFlashcard({ userId: testUserId, deckId: otherDeckId, frontContent: "FC4", backContent: "B4", status: FirebaseProgrammedReviewStatus.LEARNING });
+    [7m   [0m [91m                                                                                                                                              ~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m103[0m:[93m3[0m
+        [7m103[0m   status: FirebaseFlashcardStatus; // ACTIVE, INACTIVE, ARCHIVED, LEARNING, REVIEWING, MASTERED, SUSPENDED
+        [7m   [0m [96m  ~~~~~~[0m
+        The expected type comes from property 'status' which is declared here on type 'FirebaseFlashcardCreatePayload'
+
+FAIL src/tests/integration/services/firebasePaymentService.integration.test.ts
+  ● Test suite failed to run
+
+    [96msrc/services/firebasePaymentService.ts[0m:[93m1[0m:[93m27[0m - [91merror[0m[90m TS2724: [0m'"../config/firebaseAdmin"' has no exported member named 'firestoreDb'. Did you mean 'firestore'?
+
+    [7m1[0m import { firestore as db, firestoreDb } from "../config/firebaseAdmin";
+    [7m [0m [91m                          ~~~~~~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m135[0m:[93m68[0m - [91merror[0m[90m TS7006: [0mParameter 'transaction' implicitly has an 'any' type.
+
+    [7m135[0m     const updatedPayment = await firestoreDb.runTransaction(async (transaction) => {
+    [7m   [0m [91m                                                                   ~~~~~~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m171[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'durationDays' does not exist on type 'FirebasePlan'.
+
+    [7m171[0m       const planDurationDays = planDetails.durationDays ?? 30;
+    [7m   [0m [91m                                           ~~~~~~~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m175[0m:[93m48[0m - [91merror[0m[90m TS2339: [0mProperty 'endsAt' does not exist on type 'FirebaseUserPlan'.
+
+    [7m175[0m         const currentEndsAt = existingUserPlan.endsAt ? existingUserPlan.endsAt.toDate() : new Date();
+    [7m   [0m [91m                                               ~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m175[0m:[93m74[0m - [91merror[0m[90m TS2339: [0mProperty 'endsAt' does not exist on type 'FirebaseUserPlan'.
+
+    [7m175[0m         const currentEndsAt = existingUserPlan.endsAt ? existingUserPlan.endsAt.toDate() : new Date();
+    [7m   [0m [91m                                                                         ~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m184[0m:[93m34[0m - [91merror[0m[90m TS2551: [0mProperty 'paymentMethodType' does not exist on type 'FirebasePayment'. Did you mean 'paymentMethod'?
+
+    [7m184[0m           paymentMethod: payment.paymentMethodType,
+    [7m   [0m [91m                                 ~~~~~~~~~~~~~~~~~[0m
+
+      [96msrc/types/firebasePaymentTypes.ts[0m:[93m64[0m:[93m3[0m
+        [7m64[0m   paymentMethod: FirebasePaymentMethod;
+        [7m  [0m [96m  ~~~~~~~~~~~~~[0m
+        'paymentMethod' is declared here.
+    [96msrc/services/firebasePaymentService.ts[0m:[93m186[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'autoRenew' does not exist on type 'FirebaseUserPlan'.
+
+    [7m186[0m           autoRenew: existingUserPlan.autoRenew,
+    [7m   [0m [91m                                      ~~~~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m205[0m:[93m34[0m - [91merror[0m[90m TS2551: [0mProperty 'paymentMethodType' does not exist on type 'FirebasePayment'. Did you mean 'paymentMethod'?
+
+    [7m205[0m           paymentMethod: payment.paymentMethodType as FirebasePaymentMethodType | FirebasePaymentMethod,
+    [7m   [0m [91m                                 ~~~~~~~~~~~~~~~~~[0m
+
+      [96msrc/types/firebasePaymentTypes.ts[0m:[93m64[0m:[93m3[0m
+        [7m64[0m   paymentMethod: FirebasePaymentMethod;
+        [7m  [0m [96m  ~~~~~~~~~~~~~[0m
+        'paymentMethod' is declared here.
+    [96msrc/services/firebasePaymentService.ts[0m:[93m274[0m:[93m68[0m - [91merror[0m[90m TS7006: [0mParameter 'transaction' implicitly has an 'any' type.
+
+    [7m274[0m     const updatedPayment = await firestoreDb.runTransaction(async (transaction) => {
+    [7m   [0m [91m                                                                   ~~~~~~~~~~~[0m
+    [96msrc/services/firebasePaymentService.ts[0m:[93m386[0m:[93m68[0m - [91merror[0m[90m TS7006: [0mParameter 'transaction' implicitly has an 'any' type.
+
+    [7m386[0m     const updatedPayment = await firestoreDb.runTransaction(async (transaction) => {
+    [7m   [0m [91m                                                                   ~~~~~~~~~~~[0m
+
+(node:3594) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+FAIL src/tests/integration/services/firebaseQuestionService.integration.test.ts (17.91 s)
+  ● Console
+
+    console.log
+      Firebase Admin SDK initialized successfully for testing with service account.
+
+      at Object.<anonymous> (jest.setup.js:15:13)
+
+    console.log
+      Firebase Admin SDK já inicializado (detectado em firebaseAdmin.ts).
+
+      at initializeAppIfNeeded (src/config/firebaseAdmin.ts:19:21)
+
+  ● FirebaseQuestionService Integration Tests › updateQuestion should return null for non-existent ID
+
+    5 NOT_FOUND: No document to update: projects/medforum-488ec/databases/(default)/documents/questions/non-existent-id
+
+      60 |
+      61 |   const dataToUpdate = { ...processedUpdateData, updatedAt: Timestamp.now() };
+    > 62 |   await docRef.update(dataToUpdate);
+         |                ^
+      63 |   const updatedDoc = await docRef.get();
+      64 |   if (!updatedDoc.exists) {
+      65 |     return null;
+
+      at callErrorFromStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/call.ts:81:17)
+      at Object.onReceiveStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client.ts:356:55)
+      at Object.onReceiveStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client-interceptors.ts:454:34)
+      at Object.onReceiveStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client-interceptors.ts:416:48)
+      at node_modules/google-gax/node_modules/@grpc/grpc-js/src/resolving-call.ts:111:24
+      for call at
+      at ServiceClientImpl.makeUnaryRequest (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client.ts:326:42)
+      at ServiceClientImpl.<anonymous> (node_modules/google-gax/node_modules/@grpc/grpc-js/src/make-client.ts:189:15)
+      at node_modules/@google-cloud/firestore/build/src/v1/firestore_client.js:227:29
+      at node_modules/google-gax/src/normalCalls/timeout.ts:54:13
+      at repeat (node_modules/google-gax/src/normalCalls/retries.ts:104:19)
+      at node_modules/google-gax/src/normalCalls/retries.ts:144:7
+      at OngoingCallPromise.call (node_modules/google-gax/src/call.ts:81:23)
+      at NormalApiCaller.call (node_modules/google-gax/src/normalCalls/normalApiCaller.ts:43:15)
+      at node_modules/google-gax/src/createApiCall.ts:118:26
+      Caused by: Error: 
+      at WriteBatch.commit (node_modules/@google-cloud/firestore/build/src/write-batch.js:433:23)
+      at DocumentReference.update (node_modules/@google-cloud/firestore/build/src/reference.js:435:14)
+      at src/services/firebaseQuestionService.ts:62:16
+      at src/services/firebaseQuestionService.ts:8:71
+      at Object.<anonymous>.__awaiter (src/services/firebaseQuestionService.ts:4:12)
+      at updateQuestion (src/services/firebaseQuestionService.ts:50:39)
+      at src/tests/integration/services/firebaseQuestionService.integration.test.ts:149:49
+      at src/tests/integration/services/firebaseQuestionService.integration.test.ts:8:71
+      at Object.<anonymous>.__awaiter (src/tests/integration/services/firebaseQuestionService.integration.test.ts:4:12)
+      at Object.<anonymous> (src/tests/integration/services/firebaseQuestionService.integration.test.ts:148:76)
+
+  ● FirebaseQuestionService Integration Tests › deleteQuestion should return null for non-existent ID
+
+    5 NOT_FOUND: No document to update: projects/medforum-488ec/databases/(default)/documents/questions/non-existent-id-for-delete
+
+      77 |     updatedAt: Timestamp.now(),
+      78 |   };
+    > 79 |   await docRef.update(updateData);
+         |                ^
+      80 |   const updatedDoc = await docRef.get();
+      81 |   return updatedDoc.exists ? (updatedDoc.data() as FirebaseQuestion) : null;
+      82 | };
+
+      at callErrorFromStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/call.ts:81:17)
+      at Object.onReceiveStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client.ts:356:55)
+      at Object.onReceiveStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client-interceptors.ts:454:34)
+      at Object.onReceiveStatus (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client-interceptors.ts:416:48)
+      at node_modules/google-gax/node_modules/@grpc/grpc-js/src/resolving-call.ts:111:24
+      for call at
+      at ServiceClientImpl.makeUnaryRequest (node_modules/google-gax/node_modules/@grpc/grpc-js/src/client.ts:326:42)
+      at ServiceClientImpl.<anonymous> (node_modules/google-gax/node_modules/@grpc/grpc-js/src/make-client.ts:189:15)
+      at node_modules/@google-cloud/firestore/build/src/v1/firestore_client.js:227:29
+      at node_modules/google-gax/src/normalCalls/timeout.ts:54:13
+      at repeat (node_modules/google-gax/src/normalCalls/retries.ts:104:19)
+      at node_modules/google-gax/src/normalCalls/retries.ts:144:7
+      at OngoingCallPromise.call (node_modules/google-gax/src/call.ts:81:23)
+      at NormalApiCaller.call (node_modules/google-gax/src/normalCalls/normalApiCaller.ts:43:15)
+      at node_modules/google-gax/src/createApiCall.ts:118:26
+      Caused by: Error: 
+      at WriteBatch.commit (node_modules/@google-cloud/firestore/build/src/write-batch.js:433:23)
+      at DocumentReference.update (node_modules/@google-cloud/firestore/build/src/reference.js:435:14)
+      at src/services/firebaseQuestionService.ts:79:16
+      at src/services/firebaseQuestionService.ts:8:71
+      at Object.<anonymous>.__awaiter (src/services/firebaseQuestionService.ts:4:12)
+      at deleteQuestion (src/services/firebaseQuestionService.ts:72:86)
+      at src/tests/integration/services/firebaseQuestionService.integration.test.ts:170:40
+      at src/tests/integration/services/firebaseQuestionService.integration.test.ts:8:71
+      at Object.<anonymous>.__awaiter (src/tests/integration/services/firebaseQuestionService.integration.test.ts:4:12)
+      at Object.<anonymous> (src/tests/integration/services/firebaseQuestionService.integration.test.ts:169:76)
+
+FAIL src/tests/services/firebaseInvoiceService.test.ts
+  ● Test suite failed to run
+
+    TypeError: Cannot read properties of undefined (reading 'auth')
+
+       5 |
+       6 | const firestore = adminFirestore; // Use adminFirestore for consistency
+    >  7 | const auth = admin.auth();
+         |                    ^
+       8 |
+       9 | export const USERS_COLLECTION = "users";
+      10 | export const USER_PROFILES_COLLECTION = "userProfiles";
+
+      at Object.<anonymous> (src/services/firebaseUserService.ts:7:20)
+      at Object.<anonymous> (src/services/firebaseInvoiceService.ts:5:1)
+      at Object.<anonymous> (src/tests/services/firebaseInvoiceService.test.ts:1:1)
+
+FAIL src/tests/controllers/searchController.test.ts
+  ● Test suite failed to run
+
+    [96msrc/controllers/search/searchController.ts[0m:[93m3[0m:[93m8[0m - [91merror[0m[90m TS2613: [0mModule '"/home/ubuntu/MEDFORUM_project/src/utils/logger"' has no default export. Did you mean to use 'import { logger } from "/home/ubuntu/MEDFORUM_project/src/utils/logger"' instead?
+
+    [7m3[0m import logger from "../../utils/logger";
+    [7m [0m [91m       ~~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m51[0m:[93m16[0m - [91merror[0m[90m TS2554: [0mExpected 3 arguments, but got 1.
+
+    [7m51[0m           this.searchUsers({ query: searchTerm, page: pageNum, limit: limitNum })
+    [7m  [0m [91m               ~~~~~~~~~~~[0m
+
+      [96msrc/utils/errors.ts[0m:[93m78[0m:[93m25[0m
+        [7m78[0m   return (req: Request, res: Response, next: NextFunction) => {
+        [7m  [0m [96m                        ~~~~~~~~~~~~~[0m
+        An argument for 'res' was not provided.
+    [96msrc/controllers/search/searchController.ts[0m:[93m52[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'then' does not exist on type 'void'.
+
+    [7m52[0m             .then(data => { results.users = data; })
+    [7m  [0m [91m             ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m52[0m:[93m19[0m - [91merror[0m[90m TS7006: [0mParameter 'data' implicitly has an 'any' type.
+
+    [7m52[0m             .then(data => { results.users = data; })
+    [7m  [0m [91m                  ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m59[0m:[93m16[0m - [91merror[0m[90m TS2554: [0mExpected 3 arguments, but got 1.
+
+    [7m59[0m           this.searchDecks({ query: searchTerm, page: pageNum, limit: limitNum })
+    [7m  [0m [91m               ~~~~~~~~~~~[0m
+
+      [96msrc/utils/errors.ts[0m:[93m78[0m:[93m25[0m
+        [7m78[0m   return (req: Request, res: Response, next: NextFunction) => {
+        [7m  [0m [96m                        ~~~~~~~~~~~~~[0m
+        An argument for 'res' was not provided.
+    [96msrc/controllers/search/searchController.ts[0m:[93m60[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'then' does not exist on type 'void'.
+
+    [7m60[0m             .then(data => { results.decks = data; })
+    [7m  [0m [91m             ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m60[0m:[93m19[0m - [91merror[0m[90m TS7006: [0mParameter 'data' implicitly has an 'any' type.
+
+    [7m60[0m             .then(data => { results.decks = data; })
+    [7m  [0m [91m                  ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m67[0m:[93m16[0m - [91merror[0m[90m TS2554: [0mExpected 3 arguments, but got 1.
+
+    [7m67[0m           this.searchArticles({ query: searchTerm, page: pageNum, limit: limitNum })
+    [7m  [0m [91m               ~~~~~~~~~~~~~~[0m
+
+      [96msrc/utils/errors.ts[0m:[93m78[0m:[93m25[0m
+        [7m78[0m   return (req: Request, res: Response, next: NextFunction) => {
+        [7m  [0m [96m                        ~~~~~~~~~~~~~[0m
+        An argument for 'res' was not provided.
+    [96msrc/controllers/search/searchController.ts[0m:[93m68[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'then' does not exist on type 'void'.
+
+    [7m68[0m             .then(data => { results.articles = data; })
+    [7m  [0m [91m             ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m68[0m:[93m19[0m - [91merror[0m[90m TS7006: [0mParameter 'data' implicitly has an 'any' type.
+
+    [7m68[0m             .then(data => { results.articles = data; })
+    [7m  [0m [91m                  ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m75[0m:[93m16[0m - [91merror[0m[90m TS2554: [0mExpected 3 arguments, but got 1.
+
+    [7m75[0m           this.searchQuestions({ query: searchTerm, page: pageNum, limit: limitNum })
+    [7m  [0m [91m               ~~~~~~~~~~~~~~~[0m
+
+      [96msrc/utils/errors.ts[0m:[93m78[0m:[93m25[0m
+        [7m78[0m   return (req: Request, res: Response, next: NextFunction) => {
+        [7m  [0m [96m                        ~~~~~~~~~~~~~[0m
+        An argument for 'res' was not provided.
+    [96msrc/controllers/search/searchController.ts[0m:[93m76[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'then' does not exist on type 'void'.
+
+    [7m76[0m             .then(data => { results.questions = data; })
+    [7m  [0m [91m             ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m76[0m:[93m19[0m - [91merror[0m[90m TS7006: [0mParameter 'data' implicitly has an 'any' type.
+
+    [7m76[0m             .then(data => { results.questions = data; })
+    [7m  [0m [91m                  ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m83[0m:[93m16[0m - [91merror[0m[90m TS2554: [0mExpected 3 arguments, but got 1.
+
+    [7m83[0m           this.searchMentorships({ query: searchTerm, page: pageNum, limit: limitNum })
+    [7m  [0m [91m               ~~~~~~~~~~~~~~~~~[0m
+
+      [96msrc/utils/errors.ts[0m:[93m78[0m:[93m25[0m
+        [7m78[0m   return (req: Request, res: Response, next: NextFunction) => {
+        [7m  [0m [96m                        ~~~~~~~~~~~~~[0m
+        An argument for 'res' was not provided.
+    [96msrc/controllers/search/searchController.ts[0m:[93m84[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'then' does not exist on type 'void'.
+
+    [7m84[0m             .then(data => { results.mentorships = data; })
+    [7m  [0m [91m             ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m84[0m:[93m19[0m - [91merror[0m[90m TS7006: [0mParameter 'data' implicitly has an 'any' type.
+
+    [7m84[0m             .then(data => { results.mentorships = data; })
+    [7m  [0m [91m                  ~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m169[0m:[93m11[0m - [91merror[0m[90m TS7034: [0mVariable 'users' implicitly has type 'any[]' in some locations where its type cannot be determined.
+
+    [7m169[0m     const users = [];
+    [7m   [0m [91m          ~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m206[0m:[93m14[0m - [91merror[0m[90m TS7005: [0mVariable 'users' implicitly has an 'any[]' type.
+
+    [7m206[0m       items: users,
+    [7m   [0m [91m             ~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m262[0m:[93m7[0m - [91merror[0m[90m TS2740: [0mType 'Query<DocumentData>' is missing the following properties from type 'CollectionReference<DocumentData>': id, parent, path, listDocuments, and 2 more.
+
+    [7m262[0m       decksQuery = decksQuery.where('isPublic', '==', isPublic);
+    [7m   [0m [91m      ~~~~~~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m266[0m:[93m5[0m - [91merror[0m[90m TS2740: [0mType 'Query<DocumentData>' is missing the following properties from type 'CollectionReference<DocumentData>': id, parent, path, listDocuments, and 2 more.
+
+    [7m266[0m     decksQuery = decksQuery
+    [7m   [0m [91m    ~~~~~~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m289[0m:[93m7[0m - [91merror[0m[90m TS2740: [0mType 'Query<DocumentData>' is missing the following properties from type 'CollectionReference<DocumentData>': id, parent, path, listDocuments, and 2 more.
+
+    [7m289[0m       countQuery = countQuery.where('isPublic', '==', isPublic);
+    [7m   [0m [91m      ~~~~~~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m552[0m:[93m7[0m - [91merror[0m[90m TS2740: [0mType 'Query<DocumentData>' is missing the following properties from type 'CollectionReference<DocumentData>': id, parent, path, listDocuments, and 2 more.
+
+    [7m552[0m       mentorshipsQuery = mentorshipsQuery.where('status', '==', status);
+    [7m   [0m [91m      ~~~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m556[0m:[93m5[0m - [91merror[0m[90m TS2740: [0mType 'Query<DocumentData>' is missing the following properties from type 'CollectionReference<DocumentData>': id, parent, path, listDocuments, and 2 more.
+
+    [7m556[0m     mentorshipsQuery = mentorshipsQuery
+    [7m   [0m [91m    ~~~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/search/searchController.ts[0m:[93m583[0m:[93m7[0m - [91merror[0m[90m TS2740: [0mType 'Query<DocumentData>' is missing the following properties from type 'CollectionReference<DocumentData>': id, parent, path, listDocuments, and 2 more.
+
+    [7m583[0m       countQuery = countQuery.where('status', '==', status);
+    [7m   [0m [91m      ~~~~~~~~~~[0m
+
+FAIL src/__tests__/integration/health.test.ts
+  ● Test suite failed to run
+
+    [96msrc/controllers/commentController.ts[0m:[93m31[0m:[93m63[0m - [91merror[0m[90m TS2345: [0mArgument of type 'Omit<FirebaseComment, "id" | "createdAt" | "updatedAt">' is not assignable to parameter of type '{ postId: string; contentType: "post" | "article" | "question"; userId: string; content: string; parentId?: string | null | undefined; authorName?: string | undefined; authorProfileImage?: string | ... 1 more ... | undefined; }'.
+      Types of property 'postId' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+
+    [7m31[0m         const newComment = await CommentService.createComment(commentData as Omit<FirebaseComment, "id" | "createdAt" | "updatedAt">);
+    [7m  [0m [91m                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/commentController.ts[0m:[93m128[0m:[93m78[0m - [91merror[0m[90m TS2554: [0mExpected 2 arguments, but got 3.
+
+    [7m128[0m         await CommentService.deleteComment(commentId, userId!, /* isAdmin */ authReq.user?.role === "admin");
+    [7m   [0m [91m                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+FAIL src/tests/controllers/questionController.test.ts
+  ● Test suite failed to run
+
+    [96msrc/controllers/question/questionController.ts[0m:[93m84[0m:[93m7[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'categoryId' does not exist in type 'WithFieldValue<Omit<FirebaseQuestion, "id">>'.
+
+    [7m84[0m       categoryId: questionData.categoryId,
+    [7m  [0m [91m      ~~~~~~~~~~[0m
+    [96msrc/controllers/question/questionController.ts[0m:[93m84[0m:[93m32[0m - [91merror[0m[90m TS2339: [0mProperty 'categoryId' does not exist on type 'Partial<FirebaseQuestion>'.
+
+    [7m84[0m       categoryId: questionData.categoryId,
+    [7m  [0m [91m                               ~~~~~~~~~~[0m
+    [96msrc/controllers/question/questionController.ts[0m:[93m85[0m:[93m29[0m - [91merror[0m[90m TS2339: [0mProperty 'topicId' does not exist on type 'Partial<FirebaseQuestion>'.
+
+    [7m85[0m       topicId: questionData.topicId,
+    [7m  [0m [91m                            ~~~~~~~[0m
+    [96msrc/controllers/question/questionController.ts[0m:[93m86[0m:[93m35[0m - [91merror[0m[90m TS2339: [0mProperty 'institutionId' does not exist on type 'Partial<FirebaseQuestion>'.
+
+    [7m86[0m       institutionId: questionData.institutionId,
+    [7m  [0m [91m                                  ~~~~~~~~~~~~~[0m
+    [96msrc/controllers/question/questionController.ts[0m:[93m87[0m:[93m28[0m - [91merror[0m[90m TS2339: [0mProperty 'examId' does not exist on type 'Partial<FirebaseQuestion>'.
+
+    [7m87[0m       examId: questionData.examId,
+    [7m  [0m [91m                           ~~~~~~[0m
+    [96msrc/controllers/question/questionController.ts[0m:[93m104[0m:[93m62[0m - [91merror[0m[90m TS2345: [0mArgument of type 'WithFieldValue<Omit<FirebaseQuestion, "id">>' is not assignable to parameter of type 'WithFieldValue<FirebaseQuestion>'.
+      Type 'Omit<FirebaseQuestion, "id">' is not assignable to type 'WithFieldValue<FirebaseQuestion>'.
+        Property 'id' is missing in type 'Omit<FirebaseQuestion, "id">' but required in type '{ id: string | FieldValue; title?: FieldValue | WithFieldValue<string | undefined>; statement: string | FieldValue; alternatives: FieldValue | WithFieldValue<...>; ... 27 more ...; metadata?: FieldValue | WithFieldValue<...>; }'.
+
+    [7m104[0m       const questionRef = await this.questionsCollection.add(newQuestionData);
+    [7m   [0m [91m                                                             ~~~~~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m420[0m:[93m3[0m
+        [7m420[0m   id: string;
+        [7m   [0m [96m  ~~[0m
+        'id' is declared here.
+    [96msrc/controllers/question/questionController.ts[0m:[93m500[0m:[93m13[0m - [91merror[0m[90m TS2322: [0mType 'string | null' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.
+
+    [7m500[0m             explanation: alternativeData.explanation || null,
+    [7m   [0m [91m            ~~~~~~~~~~~[0m
+
+      [96msrc/types/firebaseTypes.ts[0m:[93m415[0m:[93m3[0m
+        [7m415[0m   explanation?: string;
+        [7m   [0m [96m  ~~~~~~~~~~~[0m
+        The expected type comes from property 'explanation' which is declared here on type 'FirebaseQuestionAlternative'
+    [96msrc/controllers/question/questionController.ts[0m:[93m504[0m:[93m27[0m - [91merror[0m[90m TS2304: [0mCannot find name 'FieldValue'.
+
+    [7m504[0m             alternatives: FieldValue.arrayUnion(newAlternative),
+    [7m   [0m [91m                          ~~~~~~~~~~[0m
+
+FAIL src/tests/integration/payment.routes.test.ts
+  ● Test suite failed to run
+
+    [96msrc/controllers/commentController.ts[0m:[93m31[0m:[93m63[0m - [91merror[0m[90m TS2345: [0mArgument of type 'Omit<FirebaseComment, "id" | "createdAt" | "updatedAt">' is not assignable to parameter of type '{ postId: string; contentType: "post" | "question" | "article"; userId: string; content: string; parentId?: string | null | undefined; authorName?: string | undefined; authorProfileImage?: string | ... 1 more ... | undefined; }'.
+      Types of property 'postId' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+
+    [7m31[0m         const newComment = await CommentService.createComment(commentData as Omit<FirebaseComment, "id" | "createdAt" | "updatedAt">);
+    [7m  [0m [91m                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    [96msrc/controllers/commentController.ts[0m:[93m128[0m:[93m78[0m - [91merror[0m[90m TS2554: [0mExpected 2 arguments, but got 3.
+
+    [7m128[0m         await CommentService.deleteComment(commentId, userId!, /* isAdmin */ authReq.user?.role === "admin");
+    [7m   [0m [91m                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+(node:3592) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Test Suites: 13 failed, 13 total
+Tests:       2 failed, 15 passed, 17 total
+Snapshots:   0 total
+Time:        47.508 s
+Ran all test suites.

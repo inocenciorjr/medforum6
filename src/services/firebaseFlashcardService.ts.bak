@@ -1,0 +1,596 @@
+import { firestore as adminFirestore } from "firebase-admin";
+import { 
+    FirebaseFlashcard, 
+    FirebaseFlashcardStatus, // Corrected: Use FirebaseFlashcardStatus for flashcard status
+    FirebaseFlashcardUserStatistics, 
+    FirebaseFlashcardCreatePayload,
+    FirebaseFlashcardUpdatePayload, 
+    FirebaseUserFlashcardInteraction, 
+    ReviewQuality,
+    FirebaseDeck
+} from "../types/firebaseTypes";
+import { firestore as db } from "../config/firebaseAdmin"; 
+import { AppError } from "../utils/errors";
+import { getUserById } from "./firebaseUserService"; 
+import { getDeckById } from "./firebaseDeckService";
+
+const FLASHCARDS_COLLECTION = "flashcards";
+const USER_INTERACTIONS_COLLECTION = "userFlashcardInteractions";
+const USER_STATISTICS_COLLECTION = "userStatistics"; // Assuming a general statistics collection for users
+
+// Helper to generate searchable text from flashcard content
+const generateSearchableText = (frontContent: string, backContent: string, personalNotes?: string): string => {
+    return `${frontContent.toLowerCase()} ${backContent.toLowerCase()} ${personalNotes ? personalNotes.toLowerCase() : ""}`.trim();
+};
+
+class FirebaseFlashcardService {
+
+    private async validateUserExists(userId: string): Promise<void> {
+        if (!userId) throw AppError.badRequest("UserID inválido para validação.");
+        try {
+            const user = await getUserById(userId);
+            if (!user) {
+                throw AppError.notFound("Usuário não encontrado.");
+            }
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            console.error(`Erro ao validar usuário ${userId}:`, error);
+            throw AppError.internal("Erro ao validar usuário.");
+        }
+    }
+
+    private async validateDeckExistsAndBelongsToUser(deckId: string, userId: string): Promise<void> {
+        if (!deckId || !userId) throw AppError.badRequest("DeckID ou UserID inválido para validação.");
+        try {
+            const deck = await getDeckById(deckId); 
+            if (!deck) {
+                throw AppError.notFound("Deck não encontrado.");
+            }
+            if (deck.userId !== userId) {
+                throw AppError.forbidden("Deck não pertence ao usuário.");
+            }
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            console.error(`Erro ao validar deck ${deckId} para o usuário ${userId}:`, error);
+            throw AppError.internal("Erro ao validar deck.");
+        }
+    }
+
+    async updateUserFlashcardStatistics(userId: string, deckId: string): Promise<void> {
+        await this.validateUserExists(userId);
+        // If deckId is provided, also validate it. Otherwise, stats might be user-global.
+        if (deckId) {
+            await this.validateDeckExistsAndBelongsToUser(deckId, userId); 
+        }
+
+        const flashcardsSnapshot = await db.collection(FLASHCARDS_COLLECTION)
+            .where("userId", "==", userId)
+            .where("deckId", "==", deckId) // Statistics per deck
+            .get();
+
+        let totalFlashcards = 0;
+        let learningCount = 0;
+        let masteredCount = 0;
+        let suspendedCount = 0;
+        let dueForReviewCount = 0;
+        const now = adminFirestore.Timestamp.now();
+
+        flashcardsSnapshot.docs.forEach(doc => {
+            const flashcard = doc.data() as FirebaseFlashcard;
+            totalFlashcards++;
+            switch (flashcard.status) {
+                case FirebaseFlashcardStatus.LEARNING:
+                    learningCount++;
+                    break;
+                case FirebaseFlashcardStatus.MASTERED:
+                    masteredCount++;
+                    break;
+                case FirebaseFlashcardStatus.SUSPENDED:
+                    suspendedCount++;
+                    break;
+                // REVIEWING is also an active state, might be counted as learning or separate
+                case FirebaseFlashcardStatus.REVIEWING:
+                    learningCount++; // Or a new reviewingCount variable
+                    break;
+            }
+            if (flashcard.nextReviewAt && flashcard.nextReviewAt.toMillis() <= now.toMillis() && flashcard.status !== FirebaseFlashcardStatus.SUSPENDED) {
+                dueForReviewCount++;
+            }
+        });
+
+        const statsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId).collection("flashcardDeckStats").doc(deckId);
+        const statsData: FirebaseFlashcardUserStatistics = {
+            userId,
+            deckId,
+            totalFlashcards,
+            learningFlashcards: learningCount,
+            masteredFlashcards: masteredCount,
+            suspendedFlashcards: suspendedCount,
+            dueForReviewCount,
+            lastUpdatedAt: adminFirestore.Timestamp.now(),
+        };
+
+        await statsRef.set(statsData, { merge: true });
+        console.log(`Estatísticas de flashcards atualizadas para o usuário ${userId}, deck ${deckId}`);
+    }
+
+    async getUserFlashcardStatistics(userId: string, deckId: string): Promise<FirebaseFlashcardUserStatistics | null> {
+        await this.validateUserExists(userId);
+        if (deckId) {
+            await this.validateDeckExistsAndBelongsToUser(deckId, userId);
+        }
+        
+        const statsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId).collection("flashcardDeckStats").doc(deckId);
+        const doc = await statsRef.get();
+
+        if (!doc.exists) {
+            // Optionally, calculate and return if not found, or just return null/default.
+            // For now, let's ensure updateUserFlashcardStatistics is called upon relevant actions.
+            // Or, we can calculate on the fly if not present:
+            await this.updateUserFlashcardStatistics(userId, deckId); // Calculate if not exists
+            const recalculatedDoc = await statsRef.get();
+            if (recalculatedDoc.exists) return recalculatedDoc.data() as FirebaseFlashcardUserStatistics;
+            return null; 
+        }
+        return doc.data() as FirebaseFlashcardUserStatistics;
+    }
+
+    async createFlashcard(data: FirebaseFlashcardCreatePayload): Promise<FirebaseFlashcard> {
+        await this.validateUserExists(data.userId);
+        await this.validateDeckExistsAndBelongsToUser(data.deckId, data.userId);
+
+        const now = adminFirestore.Timestamp.now();
+        const newFlashcardRef = db.collection(FLASHCARDS_COLLECTION).doc();
+
+        const searchableText = generateSearchableText(data.frontContent, data.backContent, data.personalNotes);
+
+        const newFlashcardData: FirebaseFlashcard = {
+            id: newFlashcardRef.id,
+            userId: data.userId,
+            deckId: data.deckId,
+            questionId: data.questionId || undefined,
+            frontContent: data.frontContent,
+            backContent: data.backContent,  
+            personalNotes: data.personalNotes || undefined,
+            tags: data.tags || [],
+            status: data.status !== undefined ? data.status : FirebaseFlashcardStatus.LEARNING,
+            lastReviewedAt: null,
+            nextReviewAt: now, 
+            intervalDays: 0,
+            easeFactor: 2.5, 
+            repetitions: 0,
+            lapses: 0,      
+            searchableText, 
+            createdAt: now,
+            updatedAt: now,
+            isSuspended: data.status === FirebaseFlashcardStatus.SUSPENDED,
+        };
+        
+        await newFlashcardRef.set(newFlashcardData);
+        // After creating a flashcard, update statistics
+        await this.updateUserFlashcardStatistics(data.userId, data.deckId);
+        return newFlashcardData;
+    }
+
+    async getFlashcardById(flashcardId: string, userId: string): Promise<FirebaseFlashcard | null> {
+        await this.validateUserExists(userId); 
+        const doc = await db.collection(FLASHCARDS_COLLECTION).doc(flashcardId).get();
+        if (!doc.exists) {
+            return null;
+        }
+        const flashcard = doc.data() as FirebaseFlashcard;
+        if (flashcard.userId !== userId) {
+            throw AppError.forbidden("Usuário não autorizado a acessar este flashcard.");
+        }
+        return flashcard;
+    }
+
+    async getFlashcardsByUser(
+        userId: string, 
+        page: number = 1, 
+        limit: number = 10, 
+        filters: {
+            status?: FirebaseFlashcardStatus; // Corrected
+            tags?: string[];
+            search?: string; 
+            readyForReview?: boolean;
+            questionId?: string;
+            deckId?: string;
+            sortBy?: keyof FirebaseFlashcard | "nextReviewAt";
+            sortOrder?: "ASC" | "DESC";
+        }
+    ): Promise<{ flashcards: FirebaseFlashcard[]; total: number; currentPage: number; totalPages: number }> {
+        await this.validateUserExists(userId);
+        let query: adminFirestore.Query = db.collection(FLASHCARDS_COLLECTION).where("userId", "==", userId);
+
+        if (filters.deckId) {
+            query = query.where("deckId", "==", filters.deckId);
+        }
+        if (filters.status) {
+            query = query.where("status", "==", filters.status);
+        }
+        if (filters.tags && filters.tags.length > 0) {
+            query = query.where("tags", "array-contains-any", filters.tags);
+        }
+        if (filters.questionId) {
+            query = query.where("questionId", "==", filters.questionId);
+        }
+        
+        if (filters.readyForReview) {
+            query = query.where("nextReviewAt", "<=", adminFirestore.Timestamp.now())
+                         .where("status", "!=", FirebaseFlashcardStatus.SUSPENDED);
+        }
+
+        if (filters.search && filters.search.trim() !== "") {
+            const searchTerm = filters.search.toLowerCase().trim();
+            if (searchTerm) { 
+                query = query.where("searchableText", ">=", searchTerm)
+                             .where("searchableText", "<=", searchTerm + "\uf8ff");
+                console.warn("Busca textual no Firestore é limitada. Para funcionalidades avançadas (relevância, typos), considere Algolia/Typesense.");
+            }
+        }
+
+        const totalSnapshot = await query.count().get();
+        const total = totalSnapshot.data().count;
+
+        const sortByField = filters.sortBy || (filters.search ? "createdAt" : "createdAt"); 
+        const sortOrderDirection = filters.sortOrder?.toLowerCase() as "asc" | "desc" || "desc";
+        
+        query = query.orderBy(sortByField, sortOrderDirection);
+        
+        const offset = (page - 1) * limit;
+        query = query.limit(limit).offset(offset);
+
+        const snapshot = await query.get();
+        const flashcards = snapshot.docs.map(doc => doc.data() as FirebaseFlashcard);
+        
+        return {
+            flashcards,
+            total,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+        };
+    }
+
+    async updateFlashcard(flashcardId: string, userId: string, data: FirebaseFlashcardUpdatePayload): Promise<FirebaseFlashcard> {
+        const flashcardRef = db.collection(FLASHCARDS_COLLECTION).doc(flashcardId);
+        const doc = await flashcardRef.get();
+
+        if (!doc.exists) {
+            throw AppError.notFound("Flashcard não encontrado.");
+        }
+        const existingFlashcard = doc.data() as FirebaseFlashcard;
+        if (existingFlashcard.userId !== userId) {
+            throw AppError.forbidden("Usuário não autorizado a atualizar este flashcard.");
+        }
+
+        if (data.deckId && data.deckId !== existingFlashcard.deckId) {
+            await this.validateDeckExistsAndBelongsToUser(data.deckId, userId);
+        }
+
+        const updateData: Partial<FirebaseFlashcard> = { ...data, updatedAt: adminFirestore.Timestamp.now() };
+
+        if (data.frontContent !== undefined || data.backContent !== undefined || data.personalNotes !== undefined) {
+            const newFront = data.frontContent !== undefined ? data.frontContent : existingFlashcard.frontContent;
+            const newBack = data.backContent !== undefined ? data.backContent : existingFlashcard.backContent;
+            const newPersonalNotes = data.personalNotes !== undefined ? data.personalNotes : existingFlashcard.personalNotes;
+            updateData.searchableText = generateSearchableText(newFront, newBack, newPersonalNotes);
+        }
+        if (data.status !== undefined) {
+            updateData.isSuspended = data.status === FirebaseFlashcardStatus.SUSPENDED;
+        }
+
+        await flashcardRef.update(updateData);
+        const updatedDoc = await flashcardRef.get();
+        const updatedFlashcard = updatedDoc.data() as FirebaseFlashcard;
+
+        // After updating a flashcard, update statistics
+        await this.updateUserFlashcardStatistics(userId, updatedFlashcard.deckId);
+        if (existingFlashcard.deckId !== updatedFlashcard.deckId) {
+             await this.updateUserFlashcardStatistics(userId, existingFlashcard.deckId); // Update old deck stats too if deck changed
+        }
+
+        return updatedFlashcard;
+    }
+
+    async deleteFlashcard(flashcardId: string, userId: string): Promise<void> {
+        const flashcardRef = db.collection(FLASHCARDS_COLLECTION).doc(flashcardId);
+        const doc = await flashcardRef.get();
+        if (!doc.exists) {
+            throw AppError.notFound("Flashcard não encontrado.");
+        }
+        const flashcardData = doc.data() as FirebaseFlashcard;
+        if (!flashcardData || flashcardData.userId !== userId) {
+            throw AppError.forbidden("Usuário não autorizado a excluir este flashcard.");
+        }
+        
+        const interactionQuery = db.collection(USER_INTERACTIONS_COLLECTION)
+            .where("flashcardId", "==", flashcardId)
+            .where("userId", "==", userId);
+        const interactionSnapshot = await interactionQuery.get();
+        
+        const batch = db.batch();
+        interactionSnapshot.docs.forEach(interactionDoc => batch.delete(interactionDoc.ref));
+        batch.delete(flashcardRef);
+        await batch.commit();
+
+        // After deleting a flashcard, update statistics
+        await this.updateUserFlashcardStatistics(userId, flashcardData.deckId);
+    }
+
+    async toggleArchiveFlashcard(flashcardId: string, userId: string): Promise<FirebaseFlashcard> {
+        const flashcard = await this.getFlashcardById(flashcardId, userId); 
+        if (!flashcard) {
+            throw AppError.notFound("Flashcard não encontrado ou não pertence ao usuário."); 
+        }
+
+        const newStatus = flashcard.status === FirebaseFlashcardStatus.SUSPENDED ? FirebaseFlashcardStatus.LEARNING : FirebaseFlashcardStatus.SUSPENDED;
+        const updatePayload: FirebaseFlashcardUpdatePayload = { status: newStatus };
+
+        if (newStatus === FirebaseFlashcardStatus.SUSPENDED) {
+            (updatePayload as Partial<FirebaseFlashcard>).nextReviewAt = null; 
+        } else if (newStatus === FirebaseFlashcardStatus.LEARNING && !flashcard.nextReviewAt) {
+            (updatePayload as Partial<FirebaseFlashcard>).nextReviewAt = adminFirestore.Timestamp.now();
+        }
+        
+        const updatedFlashcard = await this.updateFlashcard(flashcardId, userId, updatePayload);
+        // Statistics are updated within updateFlashcard
+        return updatedFlashcard;
+    }
+
+    async addTagsToFlashcard(flashcardId: string, userId: string, tags: string[]): Promise<FirebaseFlashcard> {
+        const flashcard = await this.getFlashcardById(flashcardId, userId);
+        if (!flashcard) {
+            throw AppError.notFound("Flashcard não encontrado ou não pertence ao usuário.");
+        }
+        const newTags = Array.from(new Set([...(flashcard.tags || []), ...tags]));
+        return this.updateFlashcard(flashcardId, userId, { tags: newTags });
+        // Statistics are updated within updateFlashcard
+    }
+
+    async removeTagsFromFlashcard(flashcardId: string, userId: string, tagsToRemove: string[]): Promise<FirebaseFlashcard> {
+        const flashcard = await this.getFlashcardById(flashcardId, userId);
+        if (!flashcard) {
+            throw AppError.notFound("Flashcard não encontrado ou não pertence ao usuário.");
+        }
+        const currentTags = flashcard.tags || [];
+        const newTags = currentTags.filter(tag => !tagsToRemove.includes(tag));
+        return this.updateFlashcard(flashcardId, userId, { tags: newTags });
+        // Statistics are updated within updateFlashcard
+    }
+
+    async recordFlashcardReview(
+        userId: string,
+        flashcardId: string,
+        quality: ReviewQuality 
+    ): Promise<{ updatedFlashcard: FirebaseFlashcard; interaction: FirebaseUserFlashcardInteraction }> {
+        const flashcard = await this.getFlashcardById(flashcardId, userId);
+        if (!flashcard) {
+             throw AppError.notFound("Flashcard não encontrado ou não pertence ao usuário para revisão.");
+        }
+        
+        if (flashcard.status === FirebaseFlashcardStatus.SUSPENDED) {
+            throw AppError.badRequest("Flashcards suspensos não podem ser revisados.");
+        }
+
+        let { intervalDays, easeFactor, repetitions, lapses } = flashcard;
+        intervalDays = intervalDays || 0;
+        easeFactor = easeFactor || 2.5;
+        repetitions = repetitions || 0;
+        lapses = lapses || 0;
+
+        const previousIntervalDays = intervalDays;
+        const previousEaseFactor = easeFactor;
+
+        repetitions++;
+        let isRelearningPhase = false;
+
+        if (quality < ReviewQuality.GOOD) {
+            lapses++;
+            intervalDays = 0; 
+            isRelearningPhase = true;
+        } else { 
+            if (repetitions === 1 || (lapses > 0 && previousIntervalDays === 0)) {
+                intervalDays = 1;
+            } else if (previousIntervalDays === 0) {
+                 intervalDays = 1;
+            } else if (previousIntervalDays === 1) {
+                 intervalDays = 6;
+            } else {
+                intervalDays = Math.round(previousIntervalDays * easeFactor);
+            }
+        }
+        
+        easeFactor = previousEaseFactor + (0.1 - (ReviewQuality.EASY + 1 - quality) * (0.08 + (ReviewQuality.EASY + 1 - quality) * 0.02));
+        if (easeFactor < 1.3) easeFactor = 1.3; 
+
+        const now = adminFirestore.Timestamp.now();
+        const nextReviewDate = new Date(now.toDate());
+        nextReviewDate.setDate(nextReviewDate.getDate() + intervalDays);
+        const nextReviewAt = adminFirestore.Timestamp.fromDate(nextReviewDate);
+
+        const updatedFlashcardFields: Partial<FirebaseFlashcard> = {
+            lastReviewedAt: now,
+            nextReviewAt,
+            intervalDays,
+            easeFactor,
+            repetitions,
+            lapses,      
+            updatedAt: now,
+            status: FirebaseFlashcardStatus.REVIEWING,
+        };
+        if (intervalDays >= 21) {
+            updatedFlashcardFields.status = FirebaseFlashcardStatus.MASTERED;
+        }
+
+        const interactionRef = db.collection(USER_INTERACTIONS_COLLECTION).doc();
+        const interactionData: FirebaseUserFlashcardInteraction = {
+            id: interactionRef.id,
+            userId,
+            flashcardId,
+            deckId: flashcard.deckId,
+            reviewQuality: quality,
+            reviewedAt: now,
+            srsInterval: intervalDays,
+            srsEaseFactor: easeFactor,
+            srsRepetitions: repetitions,
+            srsLapses: lapses,
+            nextReviewAt: nextReviewAt,
+            previousInterval: previousIntervalDays,
+            previousEaseFactor: previousEaseFactor,
+            createdAt: now,
+            updatedAt: now,
+        };
+
+        const batch = db.batch();
+        batch.update(db.collection(FLASHCARDS_COLLECTION).doc(flashcardId), updatedFlashcardFields);
+        batch.set(interactionRef, interactionData);
+        await batch.commit();
+
+        const updatedFlashcardDoc = await db.collection(FLASHCARDS_COLLECTION).doc(flashcardId).get();
+        const updatedFlashcard = updatedFlashcardDoc.data() as FirebaseFlashcard;
+
+        // After recording a review, update statistics
+        await this.updateUserFlashcardStatistics(userId, updatedFlashcard.deckId);
+
+        return { updatedFlashcard, interaction: interactionData };
+    }
+
+    async getUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
+        await this.validateUserExists(userId);
+        if (deckId) {
+            await this.validateDeckExistsAndBelongsToUser(deckId, userId);
+        }
+
+        const statsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId);
+        const doc = await statsRef.get();
+
+        if (doc.exists) {
+            const data = doc.data();
+            // If deckId is provided, look for deck-specific stats, otherwise global flashcard stats
+            const flashcardStats = deckId ? data?.deckFlashcardStats?.[deckId] : data?.userFlashcardStats;
+            if (flashcardStats) {
+                 // Ensure all fields from FirebaseFlashcardUserStatistics are present, with defaults if not
+                return {
+                    id: flashcardStats.id || statsRef.id, // or generate a specific ID if needed
+                    userId: userId,
+                    deckId: deckId || flashcardStats.deckId,
+                    totalFlashcards: flashcardStats.totalFlashcards || 0,
+                    activeFlashcards: flashcardStats.activeFlashcards || 0,
+                    suspendedFlashcards: flashcardStats.suspendedFlashcards || 0,
+                    archivedFlashcards: flashcardStats.archivedFlashcards || 0, // Assuming this field exists or defaults to 0
+                    dueForReviewCount: flashcardStats.dueForReviewCount || 0,
+                    masteredFlashcards: flashcardStats.masteredFlashcards || 0,
+                    learningFlashcards: flashcardStats.learningFlashcards || 0,
+                    newFlashcards: flashcardStats.newFlashcards || 0,
+                    averageEaseFactor: flashcardStats.averageEaseFactor || 0,
+                    averageIntervalDays: flashcardStats.averageIntervalDays || 0,
+                    createdAt: flashcardStats.createdAt || adminFirestore.Timestamp.now(),
+                    updatedAt: flashcardStats.updatedAt || adminFirestore.Timestamp.now(),
+                } as FirebaseFlashcardUserStatistics;
+            }
+        }
+        
+        // If no specific stats found, calculate them or return a default structure
+        // This part might need to be more sophisticated if stats are not pre-calculated and stored
+        const calculatedStats = await this.calculateAndStoreUserFlashcardStatistics(userId, deckId);
+        return calculatedStats;
+    }
+
+    async updateUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
+        return this.calculateAndStoreUserFlashcardStatistics(userId, deckId);
+    }
+
+    private async calculateAndStoreUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
+        await this.validateUserExists(userId);
+        let query = db.collection(FLASHCARDS_COLLECTION).where("userId", "==", userId);
+        if (deckId) {
+            await this.validateDeckExistsAndBelongsToUser(deckId, userId);
+            query = query.where("deckId", "==", deckId);
+        }
+
+        const snapshot = await query.get();
+        const flashcards = snapshot.docs.map(doc => doc.data() as FirebaseFlashcard);
+
+        const now = adminFirestore.Timestamp.now();
+        let totalFlashcards = 0;
+        let activeFlashcards = 0;
+        let suspendedFlashcards = 0;
+        let dueForReviewCount = 0;
+        let masteredFlashcards = 0;
+        let learningFlashcards = 0;
+        let newFlashcards = 0;
+        let totalEaseFactor = 0;
+        let totalIntervalDays = 0;
+        let reviewedFlashcardsCount = 0;
+
+        flashcards.forEach(fc => {
+            totalFlashcards++;
+            if (fc.status !== FirebaseFlashcardStatus.SUSPENDED) {
+                activeFlashcards++;
+                if (fc.nextReviewAt && fc.nextReviewAt.toMillis() <= now.toMillis()) {
+                    dueForReviewCount++;
+                }
+            }
+            switch (fc.status) {
+                case FirebaseFlashcardStatus.SUSPENDED:
+                    suspendedFlashcards++;
+                    break;
+                case FirebaseFlashcardStatus.MASTERED:
+                    masteredFlashcards++;
+                    break;
+                case FirebaseFlashcardStatus.LEARNING:
+                    learningFlashcards++;
+                    break;
+                case FirebaseFlashcardStatus.REVIEWING: // Assuming REVIEWING is also an active state
+                    // Could be counted as learning or a separate category if needed
+                    break; 
+            }
+            if (fc.repetitions === 0) {
+                newFlashcards++;
+            }
+            if (fc.status !== FirebaseFlashcardStatus.SUSPENDED && fc.repetitions !== undefined && fc.repetitions > 0) {
+                totalEaseFactor += (fc.easeFactor || 0);
+                totalIntervalDays += (fc.intervalDays || 0);
+                reviewedFlashcardsCount++;
+            }
+        });
+
+        const averageEaseFactor = reviewedFlashcardsCount > 0 ? totalEaseFactor / reviewedFlashcardsCount : 0;
+        const averageIntervalDays = reviewedFlashcardsCount > 0 ? totalIntervalDays / reviewedFlashcardsCount : 0;
+
+        const statsData: FirebaseFlashcardUserStatistics = {
+            id: userId + (deckId ? `_${deckId}` : "_allDecks"), // Composite ID for stats
+            userId,
+            deckId: deckId || undefined,
+            totalFlashcards,
+            activeFlashcards,
+            suspendedFlashcards,
+            archivedFlashcards: 0, // Assuming archived is not a status for flashcards directly, or needs separate logic
+            dueForReviewCount,
+            masteredFlashcards,
+            learningFlashcards,
+            newFlashcards,
+            averageEaseFactor,
+            averageIntervalDays,
+            createdAt: now, // This should ideally be the creation time of the stats document
+            updatedAt: now,
+        };
+
+        // Store these stats in a subcollection or a specific field within the user's general statistics document
+        const userStatsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId);
+        const updatePayload: any = {};
+        if (deckId) {
+            updatePayload[`deckFlashcardStats.${deckId}`] = statsData;
+        } else {
+            updatePayload[`userFlashcardStats`] = statsData; // For overall user flashcard stats
+        }
+        
+        await userStatsRef.set(updatePayload, { merge: true });
+
+        return statsData;
+    }
+}
+
+export const firebaseFlashcardService = new FirebaseFlashcardService();
+

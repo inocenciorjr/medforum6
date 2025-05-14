@@ -1,0 +1,129 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "questionListItems",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "questionListId", "order": "ASCENDING"},
+        {"fieldPath": "order", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "publishedAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "categoryId", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "publishedAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "authorId", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "publishedAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "searchableText", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "publishedAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "tags", "arrayConfig": "CONTAINS"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "publishedAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "comments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "postId", "order": "ASCENDING"},
+        {"fieldPath": "isDeleted", "order": "ASCENDING"},
+        {"fieldPath": "parentId", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "comments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "postId", "order": "ASCENDING"},
+        {"fieldPath": "isDeleted", "order": "ASCENDING"},
+        {"fieldPath": "parentId", "order": "ASCENDING"},
+        {"fieldPath": "likeCount", "order": "DESCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "question_lists",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "userId", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "question_lists",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "isPublic", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "simulated_exams",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "simulated_exams",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "isPublic", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "simulated_exams",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "createdBy", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "userId", "order": "ASCENDING"},
+        {"fieldPath": "read", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+

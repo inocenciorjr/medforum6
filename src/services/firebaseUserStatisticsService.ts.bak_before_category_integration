@@ -1,0 +1,308 @@
+import { firestore as db } from "../config/firebaseAdmin";
+import {
+  FirebaseUserStatistics,
+} from "../types/firebaseTypes";
+import { Timestamp } from "firebase-admin/firestore";
+
+const USER_STATISTICS_COLLECTION = "user_statistics";
+
+/**
+ * Creates or retrieves user statistics. If statistics don't exist for the user, they are initialized.
+ * The ID of the UserStatistics document will be the same as the userId.
+ */
+export const getOrCreateUserStatistics = async (userId: string): Promise<FirebaseUserStatistics> => {
+  const statsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId);
+  const docSnap = await statsRef.get();
+
+  if (docSnap.exists) {
+    return docSnap.data() as FirebaseUserStatistics;
+  }
+
+  // Initialize new statistics
+  const now = Timestamp.now();
+  const newStats: FirebaseUserStatistics = {
+    id: userId,
+    userId: userId,
+    totalQuestionsAnswered: 0,
+    correctAnswers: 0,
+    incorrectAnswers: 0,
+    simulatedExamsTaken: 0,
+    totalStudyTimeMinutes: 0,
+    questionsPerDay: {},
+    studyTimePerDay: {},
+    accuracyPerDay: {},
+    accuracyPerFilter: {},
+    accuracyPerDifficulty: {},
+    streakDays: 0,
+    lastStudyDate: null,
+    strongestFilters: [],
+    weakestFilters: [],
+    improvementAreas: [],
+    lastActivityAt: now, // Set last activity to now on creation
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await statsRef.set(newStats);
+  console.log(`UserStatistics for user (ID: ${userId}) created and initialized.`);
+  return newStats;
+};
+
+/**
+ * Updates specific fields in a user's statistics document.
+ */
+export const updateUserStatistics = async (
+  userId: string,
+  updates: Partial<Omit<FirebaseUserStatistics, "id" | "userId" | "createdAt">>
+): Promise<FirebaseUserStatistics | null> => {
+  const statsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId);
+  const updateData = { ...updates, updatedAt: Timestamp.now() };
+
+  try {
+    await statsRef.update(updateData);
+    console.log(`UserStatistics for user (ID: ${userId}) updated successfully.`);
+    const updatedDoc = await statsRef.get();
+    return updatedDoc.exists ? (updatedDoc.data() as FirebaseUserStatistics) : null;
+  } catch (error) {
+    console.error(`Error updating UserStatistics for user (ID: ${userId}):`, error);
+    // If the document doesn't exist, getOrCreateUserStatistics should have been called first.
+    // However, we can choose to create it here if that's desired behavior for an update.
+    // For now, let's assume it should exist for an update.
+    if ((error as any).code === 5) { // Firestore error code for NOT_FOUND
+        console.warn(`Attempted to update non-existent UserStatistics for user ID: ${userId}. Consider creating it first.`);
+        // Optionally, create it here:
+        // const newStats = await getOrCreateUserStatistics(userId);
+        // await statsRef.update(updateData); // Try update again
+        // return await statsRef.get().then(snap => snap.data() as FirebaseUserStatistics);
+    }
+    throw error; // Re-throw the error if it's not a NOT_FOUND or if we don't handle creation here
+  }
+};
+
+
+
+// Helper function to get today's date string in YYYY-MM-DD format
+const getTodayDateString = (): string => {
+  return new Date().toISOString().split('T')[0];
+};
+
+/**
+ * Records a question answer, updating relevant statistics.
+ */
+export const recordAnswer = async (
+  userId: string,
+  isCorrect: boolean,
+  filterId?: string | null,
+  difficulty?: string | null
+): Promise<FirebaseUserStatistics | null> => {
+  const stats = await getOrCreateUserStatistics(userId);
+  const todayStr = getTodayDateString();
+  const now = Timestamp.now();
+
+  const updates: Partial<Omit<FirebaseUserStatistics, "id" | "userId" | "createdAt">> = {
+    totalQuestionsAnswered: (stats.totalQuestionsAnswered || 0) + 1,
+    correctAnswers: stats.correctAnswers + (isCorrect ? 1 : 0),
+    incorrectAnswers: stats.incorrectAnswers + (isCorrect ? 0 : 1),
+    lastActivityAt: now,
+    updatedAt: now,
+  };
+
+  // Update questionsPerDay
+  const newQuestionsPerDay = { ...stats.questionsPerDay };
+  newQuestionsPerDay[todayStr] = (newQuestionsPerDay[todayStr] || 0) + 1;
+  updates.questionsPerDay = newQuestionsPerDay;
+
+  // Update accuracyPerDay
+  const newAccuracyPerDay = { ...stats.accuracyPerDay };
+  const dailyAccuracy = newAccuracyPerDay[todayStr] || { correct: 0, total: 0 };
+  dailyAccuracy.correct += isCorrect ? 1 : 0;
+  dailyAccuracy.total += 1;
+  newAccuracyPerDay[todayStr] = dailyAccuracy;
+  updates.accuracyPerDay = newAccuracyPerDay;
+
+  // Update accuracyPerFilter
+  if (filterId) {
+    const newAccuracyPerFilter = { ...stats.accuracyPerFilter };
+    const filterAccuracy = newAccuracyPerFilter[filterId] || { correct: 0, total: 0 };
+    filterAccuracy.correct += isCorrect ? 1 : 0;
+    filterAccuracy.total += 1;
+    newAccuracyPerFilter[filterId] = filterAccuracy;
+    updates.accuracyPerFilter = newAccuracyPerFilter;
+  }
+
+  // Update accuracyPerDifficulty
+  if (difficulty) {
+    const newAccuracyPerDifficulty = { ...stats.accuracyPerDifficulty };
+    const difficultyAccuracy = newAccuracyPerDifficulty[difficulty] || { correct: 0, total: 0 };
+    difficultyAccuracy.correct += isCorrect ? 1 : 0;
+    difficultyAccuracy.total += 1;
+    newAccuracyPerDifficulty[difficulty] = difficultyAccuracy;
+    updates.accuracyPerDifficulty = newAccuracyPerDifficulty;
+  }
+
+  // Update streak
+  let currentStreak = stats.streakDays || 0;
+  if (stats.lastStudyDate) {
+    const lastStudyDate = stats.lastStudyDate.toDate();
+    const today = new Date();
+    // Normalize dates to compare day only
+    lastStudyDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const diffTime = today.getTime() - lastStudyDate.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      currentStreak += 1;
+    } else if (diffDays > 1) {
+      currentStreak = 1; // Streak broken
+    } else if (diffDays === 0) {
+      // Same day, streak continues, no change unless it was 0
+      if (currentStreak === 0) currentStreak = 1;
+    }
+  } else {
+    currentStreak = 1; // First study day
+  }
+  updates.streakDays = currentStreak;
+  updates.lastStudyDate = now; // Update last study date to today
+
+  // TODO: Recalculate strongestFilters, weakestFilters, improvementAreas based on new accuracies.
+  // This logic can be complex and might be better handled in a separate function or even a scheduled task.
+  // For now, we'll leave them as is, to be updated by a dedicated function later.
+
+  return updateUserStatistics(userId, updates);
+};
+
+/**
+ * Records study time, updating relevant statistics.
+ */
+export const recordStudyTime = async (
+  userId: string,
+  minutes: number
+): Promise<FirebaseUserStatistics | null> => {
+  if (minutes <= 0) return getOrCreateUserStatistics(userId); // No change if time is not positive
+
+  const stats = await getOrCreateUserStatistics(userId);
+  const todayStr = getTodayDateString();
+  const now = Timestamp.now();
+
+  const updates: Partial<Omit<FirebaseUserStatistics, "id" | "userId" | "createdAt">> = {
+    totalStudyTimeMinutes: (stats.totalStudyTimeMinutes || 0) + minutes,
+    lastActivityAt: now,
+    updatedAt: now,
+  };
+
+  // Update studyTimePerDay
+  const newStudyTimePerDay = { ...stats.studyTimePerDay };
+  newStudyTimePerDay[todayStr] = (newStudyTimePerDay[todayStr] || 0) + minutes;
+  updates.studyTimePerDay = newStudyTimePerDay;
+
+  // Update streak (similar logic to recordAnswer)
+  let currentStreak = stats.streakDays || 0;
+  if (stats.lastStudyDate) {
+    const lastStudyDate = stats.lastStudyDate.toDate();
+    const today = new Date();
+    lastStudyDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    const diffTime = today.getTime() - lastStudyDate.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays === 1) {
+      currentStreak += 1;
+    } else if (diffDays > 1) {
+      currentStreak = 1;
+    } else if (diffDays === 0 && currentStreak === 0) {
+        currentStreak = 1;
+    }
+  } else {
+    currentStreak = 1;
+  }
+  updates.streakDays = currentStreak;
+  updates.lastStudyDate = now;
+
+  return updateUserStatistics(userId, updates);
+};
+
+/**
+ * Increments the count of simulated exams taken by the user.
+ */
+export const incrementSimulatedExamsTaken = async (userId: string): Promise<FirebaseUserStatistics | null> => {
+    const stats = await getOrCreateUserStatistics(userId);
+    const now = Timestamp.now();
+
+    const updates: Partial<Omit<FirebaseUserStatistics, "id" | "userId" | "createdAt">> = {
+        simulatedExamsTaken: (stats.simulatedExamsTaken || 0) + 1,
+        lastActivityAt: now,
+        updatedAt: now,
+    };
+    return updateUserStatistics(userId, updates);
+};
+
+
+
+/**
+ * Calculates accuracy percentage from correct and total counts.
+ */
+const calculateAccuracy = (correct: number, total: number): number => {
+  if (total === 0) return 0;
+  return parseFloat(((correct / total) * 100).toFixed(2));
+};
+
+/**
+ * Recalculates and updates strongest filters, weakest filters, and improvement areas.
+ */
+export const recalculateStrengthsAndWeaknesses = async (userId: string): Promise<FirebaseUserStatistics | null> => {
+  const stats = await getOrCreateUserStatistics(userId);
+
+  const accuracyPerFilter = stats.accuracyPerFilter || {};
+  const filterEntries: [string, { correct: number; total: number }][] = Object.entries(accuracyPerFilter);
+
+  if (filterEntries.length === 0) {
+    // No filter data to process, ensure fields are empty arrays
+    if (stats.strongestFilters.length > 0 || stats.weakestFilters.length > 0 || stats.improvementAreas.length > 0) {
+        return updateUserStatistics(userId, {
+            strongestFilters: [],
+            weakestFilters: [],
+            improvementAreas: [],
+            updatedAt: Timestamp.now(),
+        });
+    }
+    return stats; // No changes needed
+  }
+
+  const filterAccuracies: [string, number][] = filterEntries.map(([key, statValues]) => {
+    return [key, calculateAccuracy(statValues.correct, statValues.total)];
+  });
+
+  // Sort by accuracy (descending for strongest, ascending for weakest)
+  filterAccuracies.sort((a, b) => b[1] - a[1]); // Descending
+
+  const numFilters = filterAccuracies.length;
+
+  const strongestFilters = numFilters > 0 ? [filterAccuracies[0][0]] : [];
+  
+  // For weakest, sort ascending and take top, or take from the end of descending sorted
+  const weakestFilters = numFilters > 0 ? [[...filterAccuracies].sort((a,b) => a[1] - b[1])[0][0]] : [];
+
+  const improvementThreshold = 70; // Example threshold: accuracy < 70%
+  const improvementAreas = filterAccuracies
+    .filter(([, accuracy]) => accuracy < improvementThreshold)
+    .map(([key]) => key);
+
+  // Check if there are actual changes to avoid unnecessary writes
+  const hasChanges =
+    JSON.stringify(strongestFilters) !== JSON.stringify(stats.strongestFilters) ||
+    JSON.stringify(weakestFilters) !== JSON.stringify(stats.weakestFilters) ||
+    JSON.stringify(improvementAreas) !== JSON.stringify(stats.improvementAreas);
+
+  if (!hasChanges) {
+    return stats; // No effective change in these arrays
+  }
+
+  return updateUserStatistics(userId, {
+    strongestFilters,
+    weakestFilters,
+    improvementAreas,
+    updatedAt: Timestamp.now(),
+  });
+};
+

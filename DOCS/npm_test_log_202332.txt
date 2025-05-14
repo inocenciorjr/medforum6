@@ -1,0 +1,119 @@
+ubuntu@sandbox:~ $ cd /home/ubuntu/MEDFORUM_project/MEDFORUM_project && npm test
+[previous content truncated]...anation?: string;
+              ~~~~~~~~~~~
+        The expected type comes from property 'explanation' which is declared here on type 'FirebaseQuestionAlternative'
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+ RUNS  src/tests/controllers/questionController.test.ts
+Test Suites: 8 failed, 3 passed, 11 of 14 total
+Tests:       10 failed, 58 passed, 68 total
+Snapshots:   0 total
+
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 58 passed, 68 total
+Snapshots:   0 total
+
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+ PASS  src/tests/integration/services/firebaseSimulatedExamService.integration.test.ts (9.554 s)
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+  ● Console
+    console.log
+      Firebase Admin SDK initialized successfully for testing with service account.
+
+      at Object.<anonymous> (jest.setup.js:15:13)
+    console.log
+      Firebase Admin SDK já inicializado (detectado em firebaseAdmin.ts).
+
+      at initializeAppIfNeeded (src/config/firebaseAdmin.ts:24:21)
+    console.log
+      Coleção users limpa (documentos correspondentes à query).
+
+      at src/config/firebaseAdmin.ts:60:13
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+Time:        37 s
+
+ FAIL  src/tests/integration/services/firebaseFlashcardService.integration.test.ts
+  ● Test suite failed to run
+
+    src/services/firebaseFlashcardService.ts:145:55 - error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+    145         const searchableText = generateSearchableText(data.frontContent, data.backContent, data.personalNotes);
+                                                              ~~~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:145:97 - error TS2339: Property 'personalNotes' does not exist on type 'FirebaseFlashcardCreatePayload'.
+    145         const searchableText = generateSearchableText(data.frontContent, data.backContent, data.personalNotes);
+                                                                                                        ~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:151:13 - error TS2353: Object literal may only specify known properties, and 'questionId' does not exist in type 'FirebaseFlashcard'.
+    151             questionId: data.questionId || undefined,
+                    ~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:151:30 - error TS2339: Property 'questionId' does not exist on type 'FirebaseFlashcardCreatePayload'.
+    151             questionId: data.questionId || undefined,
+                                     ~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:154:33 - error TS2339: Property 'personalNotes' does not exist on type 'FirebaseFlashcardCreatePayload'.
+    154             personalNotes: data.personalNotes || undefined,
+                                        ~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:276:112 - error TS2339: Property 'personalNotes' does not exist on type 'FirebaseFlashcard'.
+    276             const newPersonalNotes = data.personalNotes !== undefined ? data.personalNotes : existingFlashcard.personalNotes;
+                                                                                                                       ~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:277:24 - error TS2339: Property 'searchableText' does not exist on type 'Partial<FirebaseFlashcard>'.
+    277             updateData.searchableText = generateSearchableText(newFront, newBack, newPersonalNotes);
+                               ~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:280:24 - error TS2339: Property 'isSuspended' does not exist on type 'Partial<FirebaseFlashcard>'.
+    280             updateData.isSuspended = data.status === FirebaseFlashcardStatus.SUSPENDED;
+                               ~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:441:13 - error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'FirebaseUserFlashcardInteraction'.
+    441             createdAt: now,
+                    ~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:459:11 - error TS2393: Duplicate function implementation.
+    459     async getUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:500:11 - error TS2393: Duplicate function implementation.
+    500     async updateUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+Test Suites: 10 failed, 4 passed, 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+Test Suites: 10 failed, 4 passed, 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+Time:        39.179 s
+Ran all test suites.
+ubuntu@sandbox:~/MEDFORUM_project/MEDFORUM_project $

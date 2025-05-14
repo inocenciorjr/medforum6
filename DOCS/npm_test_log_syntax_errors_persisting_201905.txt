@@ -1,0 +1,147 @@
+ubuntu@sandbox:~ $ cd /home/ubuntu/MEDFORUM_project/MEDFORUM_project && npm test
+[previous content truncated]... comes from property 'explanation' which is declared here on type 'FirebaseQuestionAlternative'
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+ RUNS  src/tests/controllers/questionController.test.ts
+Test Suites: 8 failed, 3 passed, 11 of 14 total
+Tests:       10 failed, 57 passed, 67 total
+Snapshots:   0 total
+Time:        33 s, estimated 34 s
+
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 58 passed, 68 total
+Snapshots:   0 total
+Time:        33 s, estimated 34 s
+
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+ PASS  src/tests/integration/services/firebaseSimulatedExamService.integration.test.ts (9.473 s)
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+  ● Console
+    console.log
+      Firebase Admin SDK initialized successfully for testing with service account.
+
+      at Object.<anonymous> (jest.setup.js:15:13)
+    console.log
+      Firebase Admin SDK já inicializado (detectado em firebaseAdmin.ts).
+
+      at initializeAppIfNeeded (src/config/firebaseAdmin.ts:24:21)
+    console.log
+      Coleção users limpa (documentos correspondentes à query).
+
+      at src/config/firebaseAdmin.ts:60:13
+ RUNS  .../integration/services/firebaseSimulatedExamService.integration.test.ts
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 3 passed, 12 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+Time:        37 s
+
+ FAIL  src/tests/integration/services/firebaseFlashcardService.integration.test.ts
+  ● Test suite failed to run
+
+    src/services/firebaseFlashcardService.ts:519:13 - error TS7006: Parameter 'userId' implicitly has an 'any' type.
+    519         let totalFlashcards = 0;
+                    ~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:519:34 - error TS1005: ',' expected.
+    519         let totalFlashcards = 0;
+                                         ~
+    src/services/firebaseFlashcardService.ts:520:13 - error TS1005: ',' expected.
+    520         let activeFlashcards = 0;
+                    ~~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:520:35 - error TS1005: ',' expected.
+    520         let activeFlashcards = 0;
+                                          ~
+    src/services/firebaseFlashcardService.ts:521:13 - error TS1005: ',' expected.
+    521         let learningFlashcards = 0;
+                    ~~~~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:521:35 - error TS1005: ',' expected.
+    521         let learningFlashcards = 0;
+                                          ~
+    src/services/firebaseFlashcardService.ts:522:13 - error TS1005: ',' expected.
+    522         let newFlashcards = 0;
+                    ~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:522:30 - error TS1005: ',' expected.
+    522         let newFlashcards = 0;
+                                     ~
+    src/services/firebaseFlashcardService.ts:523:13 - error TS1005: ',' expected.
+    523         let totalEaseFactor = 0;
+                    ~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:523:32 - error TS1005: ',' expected.
+    523         let totalEaseFactor = 0;
+                                       ~
+    src/services/firebaseFlashcardService.ts:524:13 - error TS1005: ',' expected.
+    524         let totalIntervalDays = 0;
+                    ~~~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:524:34 - error TS1005: ',' expected.
+    524         let totalIntervalDays = 0;
+                                         ~
+    src/services/firebaseFlashcardService.ts:525:13 - error TS1005: ',' expected.
+    525         let reviewedFlashcardsCount = 0;
+                    ~~~~~~~~~~~~~~~~~~~~~~~
+    src/services/firebaseFlashcardService.ts:525:40 - error TS1005: ',' expected.
+    525         let reviewedFlashcardsCount = 0;
+                                               ~
+    src/services/firebaseFlashcardService.ts:527:19 - error TS1005: ',' expected.
+    527         flashcards.forEach(fc => {
+                          ~
+    src/services/firebaseFlashcardService.ts:552:125 - error TS1128: Declaration or statement expected.
+    552                 if (fc.status !== FirebaseFlashcardStatus.SUSPENDED && fc.repetitions !== undefined && fc.repetitions > 0) {) {
+                                                                                                                                    ~
+    src/services/firebaseFlashcardService.ts:552:127 - error TS1005: ';' expected.
+    552                 if (fc.status !== FirebaseFlashcardStatus.SUSPENDED && fc.repetitions !== undefined && fc.repetitions > 0) {) {
+                                                                                                                                      ~
+    src/services/firebaseFlashcardService.ts:557:10 - error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+    557         });
+                 ~
+    src/services/firebaseFlashcardService.ts:585:11 - error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+    585         } else {
+                  ~~~~
+    src/services/firebaseFlashcardService.ts:585:16 - error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+    585         } else {
+                       ~
+    src/services/firebaseFlashcardService.ts:592:5 - error TS1128: Declaration or statement expected.
+    592     }
+            ~
+    src/services/firebaseFlashcardService.ts:593:1 - error TS1128: Declaration or statement expected.
+    593 }
+        ~
+ RUNS  ...ests/integration/services/firebaseFlashcardService.integration.test.ts
+Test Suites: 9 failed, 4 passed, 13 of 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+Test Suites: 10 failed, 4 passed, 14 total
+Tests:       10 failed, 59 passed, 69 total
+Snapshots:   0 total
+Time:        38.833 s
+Ran all test suites.
+ubuntu@sandbox:~/MEDFORUM_project/MEDFORUM_project $

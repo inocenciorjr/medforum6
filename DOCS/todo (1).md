@@ -1,0 +1,22 @@
+# Lista de Tarefas do Projeto ForumMed (Atualizado em 13/05/2025 - Final)
+
+- [X] Ler os documentos de orientação e a lista de tarefas detalhada fornecidos.
+- [X] Extrair o conteúdo do arquivo `MEDFORUM_project.zip` para a área de trabalho.
+- [X] Analisar detalhadamente as instruções dos documentos e a lista de tarefas para definir a estratégia e priorizar as correções e implementações necessárias no código do projeto.
+- [X] Executar o comando `npm test` no diretório do projeto para identificar o estado atual dos testes e catalogar as falhas iniciais.
+- [X] Realizar múltiplas rodadas de correção de falhas reportadas pelos testes, incluindo erros de tipagem, lógica, inicialização de objetos, e sintaxe em diversos serviços e controladores. As principais áreas abordadas foram:
+    - Serviços de Mentoria (`mentorshipController.ts`, `firebaseMentorshipService.ts`)
+    - Serviços de Pagamento e Faturas (`firebasePaymentService.ts`, `firebaseInvoiceService.ts`)
+    - Tipos Globais (`firebaseTypes.ts`), com foco em `FirebaseMentorship`, `FirebaseFlashcard`, e `FirebaseUserFlashcardInteraction`.
+    - Serviços de Flashcards (`firebaseFlashcardService.ts`), incluindo a implementação de `getUserFlashcardStatistics` e correções em lógicas de SRS e interações.
+    - Configuração do Firebase Admin (`firebaseAdmin.ts`) para resolver problemas de inicialização múltipla.
+    - Serviços de Estatísticas do Usuário (`firebaseUserStatisticsService.ts`), corrigindo a inicialização de `accuracyPerFilter` e `accuracyPerDifficulty`.
+    - Controlador de Questões (`questionController.ts`) - correções parciais.
+- [ ] **PENDENTE:** Corrigir as falhas de teste restantes. A última execução de `npm test` (interrompida em 13/05/2025 ~20:28) ainda indicava falhas. Os logs (`npm_test_log_202332.txt` e o log da execução interrompida) devem ser analisados para identificar e corrigir os problemas remanescentes, especialmente em:
+    - `src/tests/controllers/questionController.test.ts` (erros de tipo e lógica na criação de questões).
+    - `src/tests/integration/services/firebaseUserStatisticsService.integration.test.ts` (possíveis problemas residuais com `accuracyPerFilter` ou `accuracyPerDifficulty` ou dados de mock).
+    - `src/services/firebaseQuestionListService.ts` (múltiplos erros de tipo e lógica, como parâmetros implícitos `any`, propriedades ausentes em `FirebaseQuestionListItem`, e uso incorreto de `FieldPath`).
+- [ ] **PENDENTE:** Implementar todos os placeholders, comentários `// TODO` e outras pendências de implementação que ainda existam no código, conforme detalhado no documento "Lista de Tarefas Detalhada - Projeto ForumMed (Atualizado em 13_05_2025).md".
+- [ ] **PENDENTE:** Após a correção de todas as falhas de teste e a implementação dos TODOs/placeholders, reexecutar `npm test` para validar a robustez completa do sistema e garantir que todos os testes passem (fiquem "verdes").
+- [ ] Preparar um relatório final com as atualizações realizadas (este documento) e criar um tutorial detalhado para a correção robusta das falhas pendentes.
+- [ ] Empacotar o projeto completo (sem a pasta `node_modules`) e enviar para o usuário.

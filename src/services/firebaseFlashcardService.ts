@@ -109,23 +109,23 @@ class FirebaseFlashcardService {
         };
 
         await flashcardRef.set(newFlashcard);
-        
+
         // Atualizar estatísticas do usuário
         await this.updateUserFlashcardStatistics(data.userId, data.deckId);
-        
+
         return newFlashcard;
     }
 
     // Obter um flashcard pelo ID
     async getFlashcardById(flashcardId: string, userId?: string): Promise<FirebaseFlashcard | null> {
         const doc = await db.collection(FLASHCARDS_COLLECTION).doc(flashcardId).get();
-        
+
         if (!doc.exists) {
             return null;
         }
-        
+
         const flashcard = doc.data() as FirebaseFlashcard;
-        
+
         // Se userId for fornecido, verificar se o usuário tem acesso ao flashcard
         if (userId && flashcard.userId !== userId) {
             throw new Error("Usuário não autorizado a acessar este flashcard.");
@@ -137,14 +137,14 @@ class FirebaseFlashcardService {
     // Listar flashcards de um usuário (sem paginação, usado internamente ou para listagens simples)
     async listUserFlashcards(userId: string, deckId?: string): Promise<FirebaseFlashcard[]> {
         await this.validateUserExists(userId);
-        
+
         let query = db.collection(FLASHCARDS_COLLECTION).where("userId", "==", userId);
-        
+
         if (deckId) {
             await this.validateDeckExistsAndBelongsToUser(deckId, userId);
             query = query.where("deckId", "==", deckId);
         }
-        
+
         const snapshot = await query.get();
         return snapshot.docs.map(doc => doc.data() as FirebaseFlashcard);
     }
@@ -163,7 +163,7 @@ class FirebaseFlashcardService {
         if (filters?.readyForReview) {
             query = query.where("nextReviewAt", "<=", Timestamp.now());
         }
-        
+
         if (filters?.status) {
             query = query.where("status", "==", filters.status);
         }
@@ -178,7 +178,7 @@ class FirebaseFlashcardService {
 
         // Aplicar ordenação e paginação para a busca dos dados
         query = query.orderBy("nextReviewAt", "asc").orderBy("createdAt", "desc"); // Prioriza os mais próximos para revisão
-        
+
         const offset = (page - 1) * limit;
         query = query.limit(limit).offset(offset);
 
@@ -193,64 +193,64 @@ class FirebaseFlashcardService {
     // Atualizar um flashcard
     async updateFlashcard(userId: string, flashcardId: string, data: FirebaseFlashcardUpdatePayload): Promise<FirebaseFlashcard> {
         await this.validateUserExists(userId);
-        
+
         const flashcardRef = db.collection(FLASHCARDS_COLLECTION).doc(flashcardId);
         const doc = await flashcardRef.get();
-        
+
         if (!doc.exists) {
             throw new AppError(`Flashcard com ID ${flashcardId} não encontrado`, 404);
         }
-        
+
         const existingFlashcard = doc.data() as FirebaseFlashcard;
-        
+
         if (existingFlashcard.userId !== userId) {
             throw new AppError(`Flashcard com ID ${flashcardId} não pertence ao usuário ${userId}`, 403);
         }
-        
+
         // Se o deck estiver sendo alterado, validar o novo deck
         if (data.deckId && data.deckId !== existingFlashcard.deckId) {
             await this.validateDeckExistsAndBelongsToUser(data.deckId, userId);
         }
-        
+
         const now = Timestamp.now();
-        
+
         const updatedFlashcardData: Partial<FirebaseFlashcard> = { ...data, updatedAt: now };
 
         await flashcardRef.update(updatedFlashcardData);
-        
+
         const updatedDoc = await flashcardRef.get();
         const finalFlashcard = updatedDoc.data() as FirebaseFlashcard;
-        
+
         // Atualizar estatísticas do usuário
         await this.updateUserFlashcardStatistics(userId, finalFlashcard.deckId);
-        
+
         // Se o deck foi alterado, atualizar estatísticas do deck antigo também
         if (data.deckId && data.deckId !== existingFlashcard.deckId) {
             await this.updateUserFlashcardStatistics(userId, existingFlashcard.deckId);
         }
-        
+
         return finalFlashcard;
     }
 
     // Excluir um flashcard
     async deleteFlashcard(userId: string, flashcardId: string): Promise<void> {
         await this.validateUserExists(userId);
-        
+
         const flashcardRef = db.collection(FLASHCARDS_COLLECTION).doc(flashcardId);
         const doc = await flashcardRef.get();
-        
+
         if (!doc.exists) {
             throw new AppError(`Flashcard com ID ${flashcardId} não encontrado`, 404);
         }
-        
+
         const flashcardData = doc.data() as FirebaseFlashcard;
-        
+
         if (flashcardData.userId !== userId) {
             throw new AppError(`Flashcard com ID ${flashcardId} não pertence ao usuário ${userId}`, 403);
         }
-        
+
         await flashcardRef.delete();
-        
+
         // Atualizar estatísticas do usuário
         await this.updateUserFlashcardStatistics(userId, flashcardData.deckId);
     }
@@ -263,11 +263,11 @@ class FirebaseFlashcardService {
     ): Promise<{ updatedFlashcard: FirebaseFlashcard, interaction: FirebaseUserFlashcardInteraction }> {
         const interaction = await this.recordFlashcardInteraction(userId, flashcardId, reviewQuality);
         const updatedFlashcard = await this.getFlashcardById(flashcardId, userId); // Pass userId for validation
-        
+
         if (!updatedFlashcard) {
             throw new AppError(`Flashcard com ID ${flashcardId} não encontrado após interação`, 404);
         }
-        
+
         return { updatedFlashcard, interaction };
     }
 
@@ -277,29 +277,29 @@ class FirebaseFlashcardService {
         reviewQuality: ReviewQuality
     ): Promise<FirebaseUserFlashcardInteraction> {
         await this.validateUserExists(userId);
-        
+
         const flashcardRef = db.collection(FLASHCARDS_COLLECTION).doc(flashcardId);
         const doc = await flashcardRef.get();
-        
+
         if (!doc.exists) {
             throw new AppError(`Flashcard com ID ${flashcardId} não encontrado`, 404);
         }
-        
+
         const flashcard = doc.data() as FirebaseFlashcard;
-        
+
         if (flashcard.userId !== userId) {
             throw new AppError(`Flashcard com ID ${flashcardId} não pertence ao usuário ${userId}`, 403);
         }
-        
+
         const now = Timestamp.now();
-        
+
         // Calcular o próximo intervalo e fator de facilidade
         const { nextInterval, newEaseFactor } = this.calculateNextReview(
             flashcard.srsEaseFactor || 2.5,
             flashcard.srsInterval || 0,
             reviewQuality
         );
-        
+
         // Determinar o novo status com base na qualidade da revisão
         let newStatus = flashcard.status;
         if (reviewQuality < ReviewQuality.GOOD) {
@@ -311,12 +311,12 @@ class FirebaseFlashcardService {
         } else {
             newStatus = FirebaseFlashcardStatus.LEARNING; // Default to learning if conditions not met
         }
-        
+
         // Calcular a próxima data de revisão
         const nextReviewDate = new Date(now.toDate().getTime()); // Start from current time
         nextReviewDate.setDate(nextReviewDate.getDate() + nextInterval);
         const nextReviewAt = Timestamp.fromDate(nextReviewDate);
-        
+
         // Atualizar o flashcard
         const updatedFlashcardData: Partial<FirebaseFlashcard> = {
             status: newStatus,
@@ -327,9 +327,9 @@ class FirebaseFlashcardService {
             nextReviewAt: nextReviewAt,
             updatedAt: now
         };
-        
+
         await flashcardRef.update(updatedFlashcardData);
-        
+
         // Registrar a interação
         const interactionRef = db.collection(FLASHCARD_INTERACTIONS_COLLECTION).doc();
         const interaction: FirebaseUserFlashcardInteraction = {
@@ -351,93 +351,62 @@ class FirebaseFlashcardService {
             createdAt: now,
             updatedAt: now
         };
-        
+
         await interactionRef.set(interaction);
-        
+
         // Atualizar estatísticas do usuário
         await this.updateUserFlashcardStatistics(userId, flashcard.deckId);
-        
+
         return interaction;
     }
 
     // Arquivar/desarquivar um flashcard
     async toggleArchiveFlashcard(flashcardId: string, userId: string): Promise<FirebaseFlashcard> {
         await this.validateUserExists(userId);
-        
+
         const flashcardRef = db.collection(FLASHCARDS_COLLECTION).doc(flashcardId);
         const doc = await flashcardRef.get();
-        
+
         if (!doc.exists) {
             throw new AppError(`Flashcard com ID ${flashcardId} não encontrado`, 404);
         }
-        
+
         const flashcard = doc.data() as FirebaseFlashcard;
-        
+
         if (flashcard.userId !== userId) {
             throw new AppError(`Flashcard com ID ${flashcardId} não pertence ao usuário ${userId}`, 403);
         }
-        
+
         // Alternar o status de arquivado
         const isArchived = flashcard.status === FirebaseFlashcardStatus.ARCHIVED;
         // If it's archived, make it active (or new if it was never reviewed). For simplicity, make it ACTIVE.
         // If it's not archived, archive it.
         const newStatus = isArchived ? FirebaseFlashcardStatus.ACTIVE : FirebaseFlashcardStatus.ARCHIVED;
-        
+
         await flashcardRef.update({
             status: newStatus,
             updatedAt: Timestamp.now()
         });
-        
+
         // Atualizar estatísticas do usuário
         await this.updateUserFlashcardStatistics(userId, flashcard.deckId);
-        
+
         // Retornar o flashcard atualizado
         const updatedDoc = await flashcardRef.get();
         return updatedDoc.data() as FirebaseFlashcard;
     }
 
     async getUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
-        await this.validateUserExists(userId);
-        
-        if (deckId) {
-            await this.validateDeckExistsAndBelongsToUser(deckId, userId);
-        }
-        
-        const statsRefPath = deckId ? 
-            `${USER_STATISTICS_COLLECTION}/${userId}/deckFlashcardStats/${deckId}` : 
-            `${USER_STATISTICS_COLLECTION}/${userId}`;
-        
-        const doc = await db.doc(statsRefPath).get(); // Use db.doc for full path
-        
-        if (doc.exists) {
-            const data = doc.data();
-            if (data) {
-                 // If deckId is provided, data is FirebaseFlashcardUserStatistics for that deck
-                 // If no deckId, data is the main user stat doc, and we need data.userFlashcardStats
-                return (deckId ? data : data.userFlashcardStats) as FirebaseFlashcardUserStatistics;
-            }
-        }
-        
-        // Se não existir, calcular e armazenar (ou retornar um default)
-        // The updateUserFlashcardStatistics will create/update it.
-        return this.updateUserFlashcardStatistics(userId, deckId);
-    }
+        const flashcardsRef = db.collection(FLASHCARDS_COLLECTION).where('userId', '==', userId);
 
-    // Atualizar estatísticas de flashcards de um usuário
-    async updateUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
-        await this.validateUserExists(userId);
-        
-        let query = db.collection(FLASHCARDS_COLLECTION).where("userId", "==", userId);
-        
         if (deckId) {
             await this.validateDeckExistsAndBelongsToUser(deckId, userId);
-            query = query.where("deckId", "==", deckId);
+            flashcardsRef.where('deckId', '==', deckId);
         }
-        
-        const snapshot = await query.get();
+
+        const snapshot = await flashcardsRef.get();
         const flashcards = snapshot.docs.map(doc => doc.data() as FirebaseFlashcard);
-        
-        const now = Timestamp.now();
+
         let totalFlashcards = flashcards.length;
         let activeFlashcards = 0;
         let learningFlashcards = 0;
@@ -452,7 +421,7 @@ class FirebaseFlashcardService {
         let reviewedFlashcardsCount = 0;
         let nextGlobalReviewAt: Timestamp | null = null;
         let lastGlobalReviewedAt: Timestamp | null = null;
-        
+
         flashcards.forEach(fc => {
             if (fc.status === FirebaseFlashcardStatus.ARCHIVED) {
                 archivedFlashcards++;
@@ -465,7 +434,7 @@ class FirebaseFlashcardService {
                 if (fc.status === FirebaseFlashcardStatus.REVIEWING) reviewingFlashcards++;
                 if (fc.status === FirebaseFlashcardStatus.MASTERED) masteredFlashcards++;
 
-                if (fc.nextReviewAt && fc.nextReviewAt.toMillis() <= now.toMillis()) {
+                if (fc.nextReviewAt && fc.nextReviewAt.toMillis() <= Timestamp.now().toMillis()) {
                     dueForReviewCount++;
                 }
 
@@ -488,7 +457,7 @@ class FirebaseFlashcardService {
         const averageEaseFactor = activeFlashcards > 0 ? totalEaseFactor / activeFlashcards : 2.5;
         const averageIntervalDays = activeFlashcards > 0 ? totalIntervalDays / activeFlashcards : 0;
 
-        const stats: FirebaseFlashcardUserStatistics = {
+         const stats: FirebaseFlashcardUserStatistics = {
             userId,
             totalFlashcards,
             activeFlashcards,
@@ -505,25 +474,31 @@ class FirebaseFlashcardService {
             dueForReviewCount: 0, // Adicionando campo obrigatório
             nextReviewAt: nextGlobalReviewAt,
             lastReviewedAt: lastGlobalReviewedAt,
-            createdAt: now,
-            updatedAt: now,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
         };
+        return stats;
+    }
 
-        // Salvar estatísticas
+    async updateUserFlashcardStatistics(userId: string, deckId?: string): Promise<FirebaseFlashcardUserStatistics> {
+        await this.validateUserExists(userId);
+         if (deckId) {
+            await this.validateDeckExistsAndBelongsToUser(deckId, userId);
+        }
+        const stats = await this.getUserFlashcardStatistics(userId, deckId);
         const userStatsRef = db.collection(USER_STATISTICS_COLLECTION).doc(userId);
-        if (deckId) {
+         if (deckId) {
             // Salvar como subcoleção ou campo aninhado para estatísticas do deck
             // Exemplo: /userStatistics/{userId}/deckFlashcardStats/{deckId}
             const deckStatsRef = userStatsRef.collection("deckFlashcardStats").doc(deckId);
             await deckStatsRef.set(stats, { merge: true });
         } else {
             // Salvar estatísticas globais do usuário
-            await userStatsRef.set({ userFlashcardStats: stats, updatedAt: now }, { merge: true });
+             await userStatsRef.set({ userFlashcardStats: stats, updatedAt: Timestamp.now() }, { merge: true });
         }
-        
+
         return stats;
     }
 }
 
 export const firebaseFlashcardService = new FirebaseFlashcardService();
-

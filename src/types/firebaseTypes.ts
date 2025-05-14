@@ -108,80 +108,42 @@ export enum FirebaseFlashcardStatus {
 // Adicionando FirebaseFlashcard e FirebaseFlashcardCreatePayload
 export interface FirebaseFlashcard {
   id: string;
-  deckId: string;
-  userId: string; // owner
   frontContent: string;
   backContent: string;
-  frontText?: string; // Adicionado para compatibilidade com testes
-  backText?: string; // Adicionado para compatibilidade com testes
-  personalNotes?: string | null;
+  deckId: string;
+  userId: string;
   questionId?: string;
-  frontImage?: string | null;
-  backImage?: string | null;
-  frontAudio?: string | null;
-  backAudio?: string | null;
   status: FirebaseFlashcardStatus;
-  tags?: string[];
-  // SRS fields
-  srsInterval?: number;
-  intervalDays?: number; // For compatibility or direct use
-  srsEaseFactor?: number;
-  easeFactor?: number; // For compatibility or direct use
-  srsRepetitions?: number;
-  repetitions?: number; // For compatibility or direct use
-  srsLapses?: number;
-  lapses?: number; // For compatibility or direct use
-  lastReviewedAt?: Timestamp | null;
-  nextReviewAt?: Timestamp | null;
-  searchableText?: string;
-  isSuspended?: boolean;
+  personalNotes?: string;
+  searchableText: string;
+  isSuspended: boolean;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
 export interface FirebaseFlashcardCreatePayload {
-  userId: string;
-  deckId: string;
   frontContent: string;
   backContent: string;
-  frontText?: string; // Adicionado para compatibilidade com testes
-  backText?: string; // Adicionado para compatibilidade com testes
-  personalNotes?: string | null;
-  frontImage?: string | null;
-  backImage?: string | null;
-  frontAudio?: string | null;
-  backAudio?: string | null;
+  deckId: string;
+  questionId?: string;
+  personalNotes?: string;
   status?: FirebaseFlashcardStatus;
-  tags?: string[];
-  srsEaseFactor?: number;
-  srsInterval?: number;
-  srsRepetitions?: number;
-  nextReviewAt?: Timestamp;
-  lastReviewedAt?: Timestamp | null;
-};
+}
 
 export type FirebaseFlashcardUpdatePayload = Partial<Omit<FirebaseFlashcard, "id" | "userId" | "createdAt" | "updatedAt">>;
 
 // Adicionando FirebaseUserFlashcardInteraction
 export interface FirebaseUserFlashcardInteraction {
-  id: string;
   userId: string;
   flashcardId: string;
   deckId: string;
-  reviewQuality: ReviewQuality; // BAD, DIFFICULT, GOOD, EASY
-  reviewedAt: Timestamp;
-  // SRS state after this review
-  srsInterval: number;
-  srsEaseFactor: number;
-  srsRepetitions: number;
-  srsLapses: number;
+  lastReviewedAt: Timestamp;
   nextReviewAt: Timestamp;
-  previousInterval?: number;
-  previousEaseFactor?: number;
-  previousStatus?: FirebaseFlashcardStatus;
-  newStatus?: FirebaseFlashcardStatus;
-  createdAt: Timestamp; // Added createdAt
-  updatedAt: Timestamp; // Added updatedAt
+  repetitions: number;
+  easeFactor: number;
+  interval: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface FirebaseFlashcardUserStatistics {
@@ -245,16 +207,16 @@ export enum FirebaseContentStatus {
   DRAFT = "DRAFT",
   PUBLISHED = "PUBLISHED",
   ARCHIVED = "ARCHIVED",
-  PENDING_REVIEW = "PENDING_REVIEW", 
-  REJECTED = "REJECTED",         
-  ACTIVE = "ACTIVE",             
-  INACTIVE = "INACTIVE",           
+  PENDING_REVIEW = "PENDING_REVIEW",
+  REJECTED = "REJECTED",
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
 }
 
 export enum FirebaseFilterStatus {
-  ACTIVE = "ACTIVE", 
-  INACTIVE = "INACTIVE", 
-  ARCHIVED = "ARCHIVED", 
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  ARCHIVED = "ARCHIVED",
 }
 
 export enum FirebaseCommentStatus {
@@ -375,11 +337,11 @@ export enum FirebaseAchievementCriteriaType {
   CUSTOM = "CUSTOM",
 }
 
-export enum FirebaseReviewStatus { 
+export enum FirebaseReviewStatus {
   PENDING = "PENDING",
   APPROVED = "APPROVED",
-  REJECTED = "REJECTED", 
-  ARCHIVED = "ARCHIVED", 
+  REJECTED = "REJECTED",
+  ARCHIVED = "ARCHIVED",
 }
 
 export enum FirebaseTagScope {
@@ -407,7 +369,7 @@ export enum FirebaseBugReportPriority {
 
 export enum FirebasePlanInterval {
   MONTHLY = "monthly",
-  YEARLY = "yearly", 
+  YEARLY = "yearly",
 }
 
 export enum FirebaseQuestionDifficulty {
@@ -417,43 +379,43 @@ export enum FirebaseQuestionDifficulty {
 }
 
 export enum FirebaseSubFilterStatus {
-  ACTIVE = "ACTIVE", 
-  INACTIVE = "INACTIVE", 
-  ARCHIVED = "ARCHIVED" 
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  ARCHIVED = "ARCHIVED"
 }
 
-export enum FirebaseCategoryStatus { 
-    ACTIVE = "ACTIVE", 
-    INACTIVE = "INACTIVE" 
+export enum FirebaseCategoryStatus {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE"
 }
 
 export enum FirebasePaymentMethodType {
-    CREDIT_CARD = "credit_card",
-    PIX = "pix",
-    BANK_SLIP = "bank_slip", 
-    OTHER = "other",
-    FREE = "free",
+  CREDIT_CARD = "credit_card",
+  PIX = "pix",
+  BANK_SLIP = "bank_slip",
+  OTHER = "other",
+  FREE = "free",
 }
 
 export enum FirebaseUserPlanStatus {
-    ACTIVE = "active",
-    CANCELLED = "cancelled",
-    EXPIRED = "expired",
-    PENDING_PAYMENT = "pending_payment",
-    PENDING_RENEWAL = "pending_renewal", 
-    SUSPENDED = "suspended",
+  ACTIVE = "active",
+  CANCELLED = "cancelled",
+  EXPIRED = "expired",
+  PENDING_PAYMENT = "pending_payment",
+  PENDING_RENEWAL = "pending_renewal",
+  SUSPENDED = "suspended",
 }
 
 export enum FirebaseQuestionListStatus {
-  ACTIVE = "active", 
-  ARCHIVED = "archived", 
+  ACTIVE = "active",
+  ARCHIVED = "archived",
 }
 
 export enum FirebaseSimulatedExamStatus {
-  DRAFT = "DRAFT", 
-  PUBLISHED = "PUBLISHED", 
-  ARCHIVED = "ARCHIVED", 
-  IN_PROGRESS = "IN_PROGRESS", 
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  ARCHIVED = "ARCHIVED",
+  IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   SCHEDULED = "SCHEDULED"
 }
@@ -475,10 +437,10 @@ export enum FirebaseQuestionListItemStatus {
 
 // Enum for ReviewQuality (used in flashcard interactions)
 export enum ReviewQuality {
-    BAD = 0,      // (0) Completely forgot
-    DIFFICULT = 1, // (1) Remembered with difficulty
-    GOOD = 2,     // (2) Remembered correctly after some hesitation
-    EASY = 3      // (3) Perfect recall
+  BAD = 0,      // (0) Completely forgot
+  DIFFICULT = 1, // (1) Remembered with difficulty
+  GOOD = 2,     // (2) Remembered correctly after some hesitation
+  EASY = 3      // (3) Perfect recall
 }
 
 // --- Interfaces ---
@@ -487,15 +449,15 @@ export interface FirebaseFilter {
   id: string;
   name: string;
   description?: string;
-  category: FirebaseFilterCategory; 
-  filterType?: FirebaseFilterType; 
+  category: FirebaseFilterCategory;
+  filterType?: FirebaseFilterType;
   displayOrder?: number;
   icon?: string;
   color?: string;
-  status?: FirebaseFilterStatus; 
+  status?: FirebaseFilterStatus;
   createdBy?: string;
   isActive: boolean;
-  isGlobal?: boolean; 
+  isGlobal?: boolean;
   subFilterCount?: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -509,49 +471,49 @@ export interface FirebaseSubFilter {
   description?: string;
   order?: number;
   isActive: boolean;
-  status?: FirebaseSubFilterStatus; 
+  status?: FirebaseSubFilterStatus;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
 export interface FirebaseQuestionAlternative {
-  id: string; 
+  id: string;
   text: string;
   isCorrect: boolean;
-  explanation?: string | null; 
-  order: number; 
+  explanation?: string | null;
+  order: number;
 }
 
 export interface FirebaseQuestion {
   id: string;
-  title?: string; 
-  statement: string; 
+  title?: string;
+  statement: string;
   alternatives: FirebaseQuestionAlternative[];
-  correctAlternativeId?: string; 
-  explanation?: string | null; 
-  difficulty: FirebaseQuestionDifficulty; 
+  correctAlternativeId?: string;
+  explanation?: string | null;
+  difficulty: FirebaseQuestionDifficulty;
   filterIds: string[];
   subFilterIds: string[];
   tags: string[];
   source?: string | null;
   year?: number | null;
-  status: FirebaseQuestionStatus; 
-  isAnnulled: boolean; 
-  isActive: boolean;   
+  status: FirebaseQuestionStatus;
+  isAnnulled: boolean;
+  isActive: boolean;
   reviewCount: number;
   averageRating: number;
-  createdBy: string; 
-  updatedBy?: string; 
+  createdBy: string;
+  updatedBy?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
   commentsAllowed?: boolean;
   lastReviewedAt?: Timestamp | null;
-  reviewStatus?: FirebaseReviewStatus; 
+  reviewStatus?: FirebaseReviewStatus;
   reviewerId?: string | null;
   reviewNotes?: string | null;
   version?: number;
   relatedQuestionIds?: string[];
-  imageUrls?: string[]; 
+  imageUrls?: string[];
   videoUrls?: string[];
   audioUrls?: string[];
   metadata?: Record<string, any>;
@@ -567,7 +529,7 @@ export interface FirebaseUserQuestionResponse {
   userId: string;
   questionId: string;
   questionListId?: string | null;
-  selectedAlternativeId?: string | null; 
+  selectedAlternativeId?: string | null;
   essayResponse?: string | null;
   isCorrect: boolean;
   responseTimeSeconds?: number;
@@ -624,10 +586,10 @@ export interface FirebaseComment {
   id: string;
   postId: string;
   contentId?: string;
-  articleId?: string;  
+  articleId?: string;
   contentType: FirebaseCommentContentType;
   userId: string;
-  authorId?: string;  
+  authorId?: string;
   authorName?: string;
   authorProfileImage?: string | null;
   content: string;
@@ -639,42 +601,42 @@ export interface FirebaseComment {
   dislikeCount?: number;
   isEdited?: boolean;
   isDeleted: boolean;
-  status: FirebaseCommentStatus; 
+  status: FirebaseCommentStatus;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  deletedAt?: Timestamp | null; 
+  deletedAt?: Timestamp | null;
 }
 
 export interface FirebaseUser {
-  id: string; 
-  uid: string; 
+  id: string;
+  uid: string;
   email: string | null;
   displayName: string | null;
   role: UserRole;
   profileImage?: string | null;
   isActive?: boolean;
-  createdAt: Timestamp; 
-  updatedAt: Timestamp; 
-  lastLoginAt?: Timestamp; 
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  lastLoginAt?: Timestamp;
 }
 
-export interface FirebaseUserProfile { 
-  userId?: string; 
-  uid?: string; 
+export interface FirebaseUserProfile {
+  userId?: string;
+  uid?: string;
   firstName?: string;
   lastName?: string;
-  name?: string; 
-  email?: string | null; 
-  role?: UserRole | null; 
-  isActive?: boolean | null; 
-  profileImage?: string | null; 
-  bio?: string | null; 
-  phone?: string | null; 
-  lastLoginAt?: Timestamp | null; 
-  preferences?: Record<string, any> | null; 
-  specialization?: string | null; 
-  interests?: string[] | null; 
-  graduationYear?: number | null; 
+  name?: string;
+  email?: string | null;
+  role?: UserRole | null;
+  isActive?: boolean | null;
+  profileImage?: string | null;
+  bio?: string | null;
+  phone?: string | null;
+  lastLoginAt?: Timestamp | null;
+  preferences?: Record<string, any> | null;
+  specialization?: string | null;
+  interests?: string[] | null;
+  graduationYear?: number | null;
   address?: string | null;
   city?: string | null;
   state?: string | null;
@@ -685,17 +647,17 @@ export interface FirebaseUserProfile {
   profession?: string | null;
   institution?: string | null;
   createdAt?: Timestamp | null;
-  updatedAt?: Timestamp | null; 
+  updatedAt?: Timestamp | null;
 }
 
-export interface FirebaseMentorProfile { 
-  id?: string; 
+export interface FirebaseMentorProfile {
+  id?: string;
   userId: string;
   specialties?: string[];
-  availability?: string | Record<string, string[]>; 
+  availability?: string | Record<string, string[]>;
   rating?: number;
-  totalSessions?: number; 
-  bio?: string; 
+  totalSessions?: number;
+  bio?: string;
   createdAt?: Timestamp;
   updatedAt: Timestamp;
 }
@@ -703,24 +665,24 @@ export interface FirebaseMentorProfile {
 export interface FirebaseArticle {
   id: string;
   title: string;
-  slug: string; 
+  slug: string;
   content: string;
-  excerpt?: string; 
+  excerpt?: string;
   authorId: string;
-  authorName?: string; 
-  categoryId?: string; 
-  categoryName?: string; 
-  status: FirebaseArticleStatus; 
+  authorName?: string;
+  categoryId?: string;
+  categoryName?: string;
+  status: FirebaseArticleStatus;
   filterIds?: string[];
   tags?: string[];
-  featuredImage?: string | null; 
-  viewCount?: number; 
-  likeCount?: number; 
-  commentCount?: number; 
-  publishedAt?: Timestamp | null; 
+  featuredImage?: string | null;
+  viewCount?: number;
+  likeCount?: number;
+  commentCount?: number;
+  publishedAt?: Timestamp | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  searchableText?: string; 
+  searchableText?: string;
 }
 
 export interface FirebaseProgrammedReview {
@@ -746,11 +708,11 @@ export interface FirebaseErrorNotebook {
   id: string;
   userId: string;
   title?: string;
-  description?: string | null; 
-  isPublic?: boolean; 
-  lastEntryAt?: Timestamp | null; 
+  description?: string | null;
+  isPublic?: boolean;
+  lastEntryAt?: Timestamp | null;
   entryCount?: number;
-  tags?: string[]; 
+  tags?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -769,7 +731,7 @@ export interface FirebaseErrorNotebookEntry {
   lastReviewedAt?: Timestamp | null;
   nextReviewAt?: Timestamp | null;
   programmedReviewId?: string | null;
-  createdAt: Timestamp; 
+  createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
@@ -811,10 +773,10 @@ export interface FirebaseAchievementCriteria {
   minAccuracyInFilter?: { filterId: string; accuracy: number };
   minQuestionsInFilter?: number;
   minStreakDays?: number;
-  minAccuracy?: number; 
-  minCompletedLists?: number; 
-  minMentorshipsCompleted?: number; 
-  customLogic?: string; 
+  minAccuracy?: number;
+  minCompletedLists?: number;
+  minMentorshipsCompleted?: number;
+  customLogic?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -824,9 +786,9 @@ export interface FirebaseUserAchievement {
   userId: string;
   achievementId: string;
   achievedAt: Timestamp;
-  progress?: number; 
-  isClaimed?: boolean; 
-  claimedAt?: Timestamp | null; 
+  progress?: number;
+  isClaimed?: boolean;
+  claimedAt?: Timestamp | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -1162,7 +1124,6 @@ export interface FirebaseSimulatedExamQuestion {
 //   createdAt: Timestamp;
 //   updatedAt: Timestamp;
 // }
-
 
 
 // Interface para estatísticas de flashcards do usuário
